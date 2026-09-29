@@ -300,7 +300,7 @@ jobs:
           set -euo pipefail
           docker push "$ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest"
           docker push "$ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest"
-
+          
   # ==================================================
   # 13. DEPLOY TO EC2 USING SSM
   # ==================================================
@@ -311,92 +311,264 @@ jobs:
     permissions:
       contents: read
       id-token: write
+
     env:
       EC2_INSTANCE_ID: ${{ vars.EC2_INSTANCE_ID }}
       APP_DIR: ${{ vars.EC2_APP_DIR || '/home/ssm-user/Meridian-Tech-Integrated' }}
       SECRET_NAME: ${{ vars.APP_SECRET_NAME || 'Meridian-Secret-For-EC2' }}
+
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
+
       - name: Deploy latest release
         shell: bash
         run: |
           set -euo pipefail
+
           : "${EC2_INSTANCE_ID:?Set the EC2_INSTANCE_ID repository variable}"
-          remote_env=$(printf 'export APP_DIR=%q AWS_REGION=%q SECRET_NAME=%q ECR_REGISTRY=%q BACKEND_IMAGE=%q FRONTEND_IMAGE=%q\n' \
-            "$APP_DIR" "$AWS_REGION" "$SECRET_NAME" "$ECR_REGISTRY" \
-            "$ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest" \
-            "$ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest")
-          remote_command="bash -s <<'MERIDIAN_REMOTE_BASH'
-          ${remote_env}$(cat <<'REMOTE'
+          : "${APP_DIR:?Set the EC2_APP_DIR repository variable}"
+          : "${SECRET_NAME:?Set the APP_SECRET_NAME repository variable}"
+
+          echo "Preparing deployment script..."
+
+          # --------------------------------------------------
+          # Build the remote deployment script locally.
+          # printf %q safely escapes all values before sending
+          # them to EC2.
+          # --------------------------------------------------
+
+          remote_script=$(cat <<EOF
+          #!/usr/bin/env bash
+
           set -euo pipefail
+
+          export APP_DIR=$(printf '%q' "$APP_DIR")
+          export AWS_REGION=$(printf '%q' "$AWS_REGION")
+          export SECRET_NAME=$(printf '%q' "$SECRET_NAME")
+          export ECR_REGISTRY=$(printf '%q' "$ECR_REGISTRY")
+          export BACKEND_IMAGE=$(printf '%q' "$ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest")
+          export FRONTEND_IMAGE=$(printf '%q' "$ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest")
+
           stage='starting deployment'
-          trap 'status=$?; echo "DEPLOYMENT FAILED during: $stage (exit $status)" >&2; exit "$status"' ERR
+
+          trap 'status=\$?; echo "DEPLOYMENT FAILED during: \$stage (exit \$status)" >&2; exit "\$status"' ERR
+
+          echo '=========================================='
           echo 'STARTING DEPLOYMENT'
-          stage="entering application directory: $APP_DIR"
-          echo "Stage: $stage"
-          cd "$APP_DIR"
+          echo '=========================================='
+
+          # --------------------------------------------------
+          # 1. APPLICATION DIRECTORY
+          # --------------------------------------------------
+
+          stage="entering application directory: \$APP_DIR"
+          echo "Stage: \$stage"
+
+          cd "\$APP_DIR"
+
+          # --------------------------------------------------
+          # 2. DEPLOYMENT FILES
+          # --------------------------------------------------
+
           stage='checking docker-compose.yml and deployment settings'
-          echo "Stage: $stage"
+          echo "Stage: \$stage"
+
           test -f docker-compose.yml
-          : "${BACKEND_IMAGE:?Backend image is required}"
-          : "${FRONTEND_IMAGE:?Frontend image is required}"
-          rm -f .previous_backend_digest .previous_frontend_digest
-          docker image inspect "$BACKEND_IMAGE" --format '{{index .RepoDigests 0}}' > .previous_backend_digest 2>/dev/null || true
-          docker image inspect "$FRONTEND_IMAGE" --format '{{index .RepoDigests 0}}' > .previous_frontend_digest 2>/dev/null || true
+
+          : "\${BACKEND_IMAGE:?Backend image is required}"
+          : "\${FRONTEND_IMAGE:?Frontend image is required}"
+
+          echo "Application directory: \$APP_DIR"
+          echo "Backend image: \$BACKEND_IMAGE"
+          echo "Frontend image: \$FRONTEND_IMAGE"
+
+          # --------------------------------------------------
+          # 3. SAVE CURRENT IMAGE DIGESTS FOR ROLLBACK
+          # --------------------------------------------------
+
+          stage='saving previous image digests'
+          echo "Stage: \$stage"
+
+          rm -f .previous_backend_digest
+          rm -f .previous_frontend_digest
+
+          docker image inspect "\$BACKEND_IMAGE" \
+            --format '{{index .RepoDigests 0}}' \
+            > .previous_backend_digest 2>/dev/null || true
+
+          docker image inspect "\$FRONTEND_IMAGE" \
+            --format '{{index .RepoDigests 0}}' \
+            > .previous_frontend_digest 2>/dev/null || true
+
+          # --------------------------------------------------
+          # 4. CHECK AWS IDENTITY
+          # --------------------------------------------------
+
           stage='checking EC2 AWS identity and secret access'
-          echo "Stage: $stage"
-          aws sts get-caller-identity --region "$AWS_REGION"
-          aws secretsmanager describe-secret --secret-id "$SECRET_NAME" --region "$AWS_REGION" >/dev/null
+          echo "Stage: \$stage"
+
+          aws sts get-caller-identity \
+            --region "\$AWS_REGION"
+
+          # --------------------------------------------------
+          # 5. CHECK SECRET
+          # --------------------------------------------------
+
+          aws secretsmanager describe-secret \
+            --secret-id "\$SECRET_NAME" \
+            --region "\$AWS_REGION" \
+            >/dev/null
+
+          # --------------------------------------------------
+          # 6. RETRIEVE SECRET
+          # --------------------------------------------------
+
           stage='retrieving application secret'
-          echo "Stage: $stage"
-          secret_json=$(aws secretsmanager get-secret-value --secret-id "$SECRET_NAME" --region "$AWS_REGION" --query SecretString --output text)
-          test -n "$secret_json"
+          echo "Stage: \$stage"
+
+          secret_json=\$(aws secretsmanager get-secret-value \
+            --secret-id "\$SECRET_NAME" \
+            --region "\$AWS_REGION" \
+            --query SecretString \
+            --output text)
+
+          test -n "\$secret_json"
+
+          # --------------------------------------------------
+          # 7. WRITE .ENV
+          # --------------------------------------------------
+
           stage='writing runtime environment file'
-          echo "Stage: $stage"
-          printf '%s' "$secret_json" | python3 -c '
+          echo "Stage: \$stage"
+
+          printf '%s' "\$secret_json" | python3 -c '
           import json
           import re
           import sys
 
           values = json.load(sys.stdin)
+
           if not isinstance(values, dict):
-              raise SystemExit("Secrets Manager value must be a JSON object")
-          reserved = {"ENVIRONMENT", "AWS_REGION", "DATABASE_PATH", "BACKEND_IMAGE", "FRONTEND_IMAGE"}
+              raise SystemExit(
+                  "Secrets Manager value must be a JSON object"
+              )
+
+          reserved = {
+              "ENVIRONMENT",
+              "AWS_REGION",
+              "DATABASE_PATH",
+              "BACKEND_IMAGE",
+              "FRONTEND_IMAGE"
+          }
+
           for key, value in values.items():
-              if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", key) or key in reserved:
+
+              if not re.fullmatch(
+                  r"[A-Za-z_][A-Za-z0-9_]*",
+                  key
+              ):
                   continue
+
+              if key in reserved:
+                  continue
+
               if isinstance(value, (dict, list)):
-                  value = json.dumps(value, separators=(",", ":"))
+                  value = json.dumps(
+                      value,
+                      separators=(",", ":")
+                  )
               else:
                   value = str(value)
-              print(f"{key}={json.dumps(value)}")
+
+              print(
+                  f"{key}={json.dumps(value)}"
+              )
           ' > .env
+
+          # Verify required secret exists
           grep -q '^JWT_SECRET=' .env
-          printf 'ENVIRONMENT=production\nAWS_REGION=%s\nDATABASE_PATH=/app/backend/data/shopmart.db\nBACKEND_IMAGE=%s\nFRONTEND_IMAGE=%s\n' \
-            "$AWS_REGION" "$BACKEND_IMAGE" "$FRONTEND_IMAGE" >> .env
+
+          # Add deployment-specific variables
+          printf '%s\n' \
+            "ENVIRONMENT=production" \
+            "AWS_REGION=\$AWS_REGION" \
+            "DATABASE_PATH=/app/backend/data/shopmart.db" \
+            "BACKEND_IMAGE=\$BACKEND_IMAGE" \
+            "FRONTEND_IMAGE=\$FRONTEND_IMAGE" \
+            >> .env
+
           chmod 600 .env
+
+          echo "Runtime .env file created successfully."
+
+          # --------------------------------------------------
+          # 8. LOGIN TO ECR
+          # --------------------------------------------------
+
           stage='logging in to Amazon ECR'
-          echo "Stage: $stage"
-          aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+          echo "Stage: \$stage"
+
+          aws ecr get-login-password \
+            --region "\$AWS_REGION" \
+            | docker login \
+                --username AWS \
+                --password-stdin "\$ECR_REGISTRY"
+
+          # --------------------------------------------------
+          # 9. PULL NEW IMAGES
+          # --------------------------------------------------
+
           stage='pulling latest Docker images'
-          echo "Stage: $stage"
+          echo "Stage: \$stage"
+
           docker compose pull
+
+          # --------------------------------------------------
+          # 10. START APPLICATION
+          # --------------------------------------------------
+
           stage='starting application containers'
-          echo "Stage: $stage"
-          docker compose up -d --no-build --remove-orphans
+          echo "Stage: \$stage"
+
+          docker compose up -d \
+            --no-build \
+            --remove-orphans
+
+          # --------------------------------------------------
+          # 11. CONTAINER STATUS
+          # --------------------------------------------------
+
           stage='checking container status'
-          echo "Stage: $stage"
+          echo "Stage: \$stage"
+
           docker compose ps
+
+          echo '=========================================='
           echo 'DEPLOYMENT COMPLETED SUCCESSFULLY'
-          REMOTE
+          echo '=========================================='
+          EOF
           )
-          MERIDIAN_REMOTE_BASH"
-          jq -n --arg command "$remote_command" '{commands: [$command]}' > ssm-commands.json
+
+          # --------------------------------------------------
+          # Encode the script so SSM receives it safely.
+          # This completely avoids shell quoting problems.
+          # --------------------------------------------------
+
+          encoded_script=$(printf '%s' "$remote_script" | base64 -w 0)
+
+          remote_command="echo '$encoded_script' | base64 -d | bash"
+
+          jq -n \
+            --arg command "$remote_command" \
+            '{commands: [$command]}' \
+            > ssm-commands.json
+
           echo 'Sending deployment command to EC2...'
+
           command_id=$(aws ssm send-command \
             --region "$AWS_REGION" \
             --instance-ids "$EC2_INSTANCE_ID" \
@@ -405,26 +577,83 @@ jobs:
             --parameters file://ssm-commands.json \
             --query 'Command.CommandId' \
             --output text)
+
           echo "SSM command ID: $command_id"
+
+          # --------------------------------------------------
+          # Wait for SSM
+          # --------------------------------------------------
+
           for attempt in $(seq 1 60); do
-            status=$(aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query Status --output text 2>/dev/null || true)
+
+            status=$(aws ssm get-command-invocation \
+              --region "$AWS_REGION" \
+              --command-id "$command_id" \
+              --instance-id "$EC2_INSTANCE_ID" \
+              --query Status \
+              --output text 2>/dev/null || true)
+
             echo "[$attempt/60] SSM status: ${status:-Pending}"
+
             case "$status" in
+
               Success)
-                aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query StandardOutputContent --output text
+
+                aws ssm get-command-invocation \
+                  --region "$AWS_REGION" \
+                  --command-id "$command_id" \
+                  --instance-id "$EC2_INSTANCE_ID" \
+                  --query StandardOutputContent \
+                  --output text
+
+                echo "Deployment succeeded."
                 exit 0
                 ;;
+
               Failed|Cancelled|TimedOut|Cancelling)
-                aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query '{Status:Status,StatusDetails:StatusDetails,Output:StandardOutputContent,Error:StandardErrorContent}' --output json || true
+
+                echo "=========================================="
+                echo "SSM DEPLOYMENT FAILED"
+                echo "=========================================="
+
+                aws ssm get-command-invocation \
+                  --region "$AWS_REGION" \
+                  --command-id "$command_id" \
+                  --instance-id "$EC2_INSTANCE_ID" \
+                  --query '{
+                    Status:Status,
+                    StatusDetails:StatusDetails,
+                    Output:StandardOutputContent,
+                    Error:StandardErrorContent
+                  }' \
+                  --output json || true
+
                 exit 1
                 ;;
+
               *)
                 [ "$attempt" -eq 60 ] || sleep 10
                 ;;
             esac
+
           done
-          aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query '{Status:Status,StatusDetails:StatusDetails,Output:StandardOutputContent,Error:StandardErrorContent}' --output json || true
+
+          echo "SSM deployment timed out."
+
+          aws ssm get-command-invocation \
+            --region "$AWS_REGION" \
+            --command-id "$command_id" \
+            --instance-id "$EC2_INSTANCE_ID" \
+            --query '{
+              Status:Status,
+              StatusDetails:StatusDetails,
+              Output:StandardOutputContent,
+              Error:StandardErrorContent
+            }' \
+            --output json || true
+
           exit 1
+
 
   # ==================================================
   # 14. VERIFY DEPLOYMENT
@@ -433,70 +662,185 @@ jobs:
     name: Verify deployment
     needs: [deploy]
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       id-token: write
+
     env:
       EC2_INSTANCE_ID: ${{ vars.EC2_INSTANCE_ID }}
       APP_DIR: ${{ vars.EC2_APP_DIR || '/home/ssm-user/Meridian-Tech-Integrated' }}
+
     steps:
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
+
       - name: Verify deployment
         shell: bash
         run: |
           set -euo pipefail
+
           : "${EC2_INSTANCE_ID:?Set the EC2_INSTANCE_ID repository variable}"
-          remote_env=$(printf 'export APP_DIR=%q\n' "$APP_DIR")
-          remote_command="bash -s <<'MERIDIAN_REMOTE_BASH'
-          ${remote_env}$(cat <<'REMOTE'
+          : "${APP_DIR:?Set the EC2_APP_DIR repository variable}"
+
+          echo "Preparing verification script..."
+
+          remote_script=$(cat <<EOF
+          #!/usr/bin/env bash
+
           set -euo pipefail
+
+          export APP_DIR=$(printf '%q' "$APP_DIR")
+
           stage='entering application directory'
-          trap 'status=$?; echo "VERIFICATION FAILED during: $stage (exit $status)" >&2; exit "$status"' ERR
-          cd "$APP_DIR"
+
+          trap 'status=\$?; echo "VERIFICATION FAILED during: \$stage (exit \$status)" >&2; exit "\$status"' ERR
+
+          cd "\$APP_DIR"
+
+          # --------------------------------------------------
+          # Container status
+          # --------------------------------------------------
+
           stage='checking Docker Compose services'
-          echo "Stage: $stage"
+          echo "Stage: \$stage"
+
           docker compose ps
-          docker compose ps --status running --services | grep -qx backend
-          docker compose ps --status running --services | grep -qx frontend
+
+          docker compose ps \
+            --status running \
+            --services \
+            | grep -qx backend
+
+          docker compose ps \
+            --status running \
+            --services \
+            | grep -qx frontend
+
+          # --------------------------------------------------
+          # Backend health
+          # --------------------------------------------------
+
           stage='checking backend health'
-          echo "Stage: $stage"
-          docker compose exec -T backend python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=10)"
+          echo "Stage: \$stage"
+
+          docker compose exec -T backend \
+            python -c \
+            "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=10)"
+
+          # --------------------------------------------------
+          # Frontend health
+          # --------------------------------------------------
+
           stage='checking frontend health'
-          echo "Stage: $stage"
-          docker compose exec -T frontend wget --spider --quiet http://127.0.0.1/health
+          echo "Stage: \$stage"
+
+          docker compose exec -T frontend \
+            wget --spider --quiet \
+            http://127.0.0.1/health
+
+          # --------------------------------------------------
+          # Reverse proxy
+          # --------------------------------------------------
+
           stage='checking public reverse-proxy health'
-          echo "Stage: $stage"
-          curl --fail --silent --show-error http://127.0.0.1/health >/dev/null
-          echo 'Backend, frontend, and reverse-proxy health checks passed.'
-          REMOTE
+          echo "Stage: \$stage"
+
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            http://127.0.0.1/health \
+            >/dev/null
+
+          echo '=========================================='
+          echo 'BACKEND HEALTH: PASS'
+          echo 'FRONTEND HEALTH: PASS'
+          echo 'REVERSE PROXY HEALTH: PASS'
+          echo 'DEPLOYMENT VERIFICATION PASSED'
+          echo '=========================================='
+          EOF
           )
-          MERIDIAN_REMOTE_BASH"
-          jq -n --arg command "$remote_command" '{commands: [$command]}' > verify.json
-          command_id=$(aws ssm send-command --region "$AWS_REGION" --instance-ids "$EC2_INSTANCE_ID" --document-name AWS-RunShellScript --comment 'Verify Meridian deployment' --parameters file://verify.json --query 'Command.CommandId' --output text)
+
+          encoded_script=$(printf '%s' "$remote_script" | base64 -w 0)
+
+          remote_command="echo '$encoded_script' | base64 -d | bash"
+
+          jq -n \
+            --arg command "$remote_command" \
+            '{commands: [$command]}' \
+            > verify.json
+
+          command_id=$(aws ssm send-command \
+            --region "$AWS_REGION" \
+            --instance-ids "$EC2_INSTANCE_ID" \
+            --document-name AWS-RunShellScript \
+            --comment 'Verify Meridian deployment' \
+            --parameters file://verify.json \
+            --query 'Command.CommandId' \
+            --output text)
+
           echo "SSM verification command ID: $command_id"
+
           for attempt in $(seq 1 30); do
-            status=$(aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query Status --output text 2>/dev/null || true)
+
+            status=$(aws ssm get-command-invocation \
+              --region "$AWS_REGION" \
+              --command-id "$command_id" \
+              --instance-id "$EC2_INSTANCE_ID" \
+              --query Status \
+              --output text 2>/dev/null || true)
+
             echo "[$attempt/30] Verification status: ${status:-Pending}"
+
             case "$status" in
+
               Success)
-                aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query StandardOutputContent --output text
+
+                aws ssm get-command-invocation \
+                  --region "$AWS_REGION" \
+                  --command-id "$command_id" \
+                  --instance-id "$EC2_INSTANCE_ID" \
+                  --query StandardOutputContent \
+                  --output text
+
                 exit 0
                 ;;
+
               Failed|Cancelled|TimedOut|Cancelling)
-                aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query '{Status:Status,StatusDetails:StatusDetails,Output:StandardOutputContent,Error:StandardErrorContent}' --output json || true
+
+                echo "=========================================="
+                echo "DEPLOYMENT VERIFICATION FAILED"
+                echo "=========================================="
+
+                aws ssm get-command-invocation \
+                  --region "$AWS_REGION" \
+                  --command-id "$command_id" \
+                  --instance-id "$EC2_INSTANCE_ID" \
+                  --query '{
+                    Status:Status,
+                    StatusDetails:StatusDetails,
+                    Output:StandardOutputContent,
+                    Error:StandardErrorContent
+                  }' \
+                  --output json || true
+
                 exit 1
                 ;;
+
               *)
                 [ "$attempt" -eq 30 ] || sleep 10
                 ;;
             esac
+
           done
-          aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query '{Status:Status,StatusDetails:StatusDetails,Output:StandardOutputContent,Error:StandardErrorContent}' --output json || true
+
           exit 1
+
 
   # ==================================================
   # 15. ROLLBACK
@@ -504,90 +848,248 @@ jobs:
   rollback:
     name: Roll back deployment
     needs: [deploy, verify]
-    if: ${{ always() && github.event_name == 'push' && github.ref == 'refs/heads/main' && (needs.deploy.result == 'failure' || needs.verify.result == 'failure') }}
+
+    if: >
+      ${{ always() &&
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
+          (needs.deploy.result == 'failure' ||
+           needs.verify.result == 'failure') }}
+
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       id-token: write
+
     env:
       EC2_INSTANCE_ID: ${{ vars.EC2_INSTANCE_ID }}
       APP_DIR: ${{ vars.EC2_APP_DIR || '/home/ssm-user/Meridian-Tech-Integrated' }}
+
     steps:
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
+
       - name: Start rollback
         shell: bash
         run: |
           set -euo pipefail
+
           : "${EC2_INSTANCE_ID:?Set the EC2_INSTANCE_ID repository variable}"
-          remote_env=$(printf 'export APP_DIR=%q AWS_REGION=%q ECR_REGISTRY=%q BACKEND_REPOSITORY=%q FRONTEND_REPOSITORY=%q\n' \
-            "$APP_DIR" "$AWS_REGION" "$ECR_REGISTRY" "$ECR_BACKEND_REPOSITORY" "$ECR_FRONTEND_REPOSITORY")
-          remote_command="bash -s <<'MERIDIAN_REMOTE_BASH'
-          ${remote_env}$(cat <<'REMOTE'
+          : "${APP_DIR:?Set the EC2_APP_DIR repository variable}"
+
+          echo "Preparing rollback script..."
+
+          remote_script=$(cat <<EOF
+          #!/usr/bin/env bash
+
           set -euo pipefail
+
+          export APP_DIR=$(printf '%q' "$APP_DIR")
+          export AWS_REGION=$(printf '%q' "$AWS_REGION")
+          export ECR_REGISTRY=$(printf '%q' "$ECR_REGISTRY")
+          export BACKEND_REPOSITORY=$(printf '%q' "$ECR_BACKEND_REPOSITORY")
+          export FRONTEND_REPOSITORY=$(printf '%q' "$ECR_FRONTEND_REPOSITORY")
+
           stage='entering application directory'
-          trap 'status=$?; echo "ROLLBACK FAILED during: $stage (exit $status)" >&2; exit "$status"' ERR
+
+          trap 'status=\$?; echo "ROLLBACK FAILED during: \$stage (exit \$status)" >&2; exit "\$status"' ERR
+
+          echo '=========================================='
           echo 'STARTING ROLLBACK'
-          cd "$APP_DIR"
+          echo '=========================================='
+
+          cd "\$APP_DIR"
+
+          # --------------------------------------------------
+          # Check previous digests
+          # --------------------------------------------------
+
           stage='checking previous image digests'
-          echo "Stage: $stage"
-          for file in .previous_backend_digest .previous_frontend_digest; do
-            if [ ! -s "$file" ]; then
-              echo "No saved previous image digest at $file; rollback is unavailable for this first deployment."
+          echo "Stage: \$stage"
+
+          for file in \
+            .previous_backend_digest \
+            .previous_frontend_digest
+          do
+
+            if [ ! -s "\$file" ]; then
+              echo "No saved previous image digest at \$file."
+              echo "Rollback is unavailable for this deployment."
+
               exit 1
             fi
+
           done
-          previous_backend=$(cat .previous_backend_digest)
-          previous_frontend=$(cat .previous_frontend_digest)
+
+          previous_backend=\$(cat .previous_backend_digest)
+          previous_frontend=\$(cat .previous_frontend_digest)
+
+          echo "Previous backend image:"
+          echo "\$previous_backend"
+
+          echo "Previous frontend image:"
+          echo "\$previous_frontend"
+
+          # --------------------------------------------------
+          # Login to ECR
+          # --------------------------------------------------
+
           stage='logging in to Amazon ECR'
-          echo "Stage: $stage"
-          aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+          echo "Stage: \$stage"
+
+          aws ecr get-login-password \
+            --region "\$AWS_REGION" \
+            | docker login \
+                --username AWS \
+                --password-stdin "\$ECR_REGISTRY"
+
+          # --------------------------------------------------
+          # Pull previous images
+          # --------------------------------------------------
+
           stage='pulling previous images'
-          echo "Stage: $stage"
-          docker pull "$previous_backend"
-          docker pull "$previous_frontend"
-          stage='restoring previous latest tags'
-          echo "Stage: $stage"
-          docker tag "$previous_backend" "$ECR_REGISTRY/$BACKEND_REPOSITORY:latest"
-          docker tag "$previous_frontend" "$ECR_REGISTRY/$FRONTEND_REPOSITORY:latest"
+          echo "Stage: \$stage"
+
+          docker pull "\$previous_backend"
+          docker pull "\$previous_frontend"
+
+          # --------------------------------------------------
+          # Restore tags
+          # --------------------------------------------------
+
+          stage='restoring previous image tags'
+          echo "Stage: \$stage"
+
+          docker tag \
+            "\$previous_backend" \
+            "\$ECR_REGISTRY/\$BACKEND_REPOSITORY:latest"
+
+          docker tag \
+            "\$previous_frontend" \
+            "\$ECR_REGISTRY/\$FRONTEND_REPOSITORY:latest"
+
+          # --------------------------------------------------
+          # Restart application
+          # --------------------------------------------------
+
           stage='restarting previous application containers'
-          echo "Stage: $stage"
+          echo "Stage: \$stage"
+
           docker compose down
+
           docker compose up -d --no-build
+
           sleep 15
+
+          # --------------------------------------------------
+          # Verify rollback
+          # --------------------------------------------------
+
           stage='checking rolled-back services'
-          echo "Stage: $stage"
+          echo "Stage: \$stage"
+
           docker compose ps
-          docker compose ps --status running --services | grep -qx backend
-          docker compose ps --status running --services | grep -qx frontend
-          docker compose exec -T backend python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=10)"
-          docker compose exec -T frontend wget --spider --quiet http://127.0.0.1/health
+
+          docker compose ps \
+            --status running \
+            --services \
+            | grep -qx backend
+
+          docker compose ps \
+            --status running \
+            --services \
+            | grep -qx frontend
+
+          docker compose exec -T backend \
+            python -c \
+            "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=10)"
+
+          docker compose exec -T frontend \
+            wget --spider --quiet \
+            http://127.0.0.1/health
+
+          echo '=========================================='
           echo 'ROLLBACK COMPLETED SUCCESSFULLY'
-          REMOTE
+          echo '=========================================='
+          EOF
           )
-          MERIDIAN_REMOTE_BASH"
-          jq -n --arg command "$remote_command" '{commands: [$command]}' > rollback.json
-          command_id=$(aws ssm send-command --region "$AWS_REGION" --instance-ids "$EC2_INSTANCE_ID" --document-name AWS-RunShellScript --comment 'Rollback Meridian deployment' --parameters file://rollback.json --query 'Command.CommandId' --output text)
+
+          encoded_script=$(printf '%s' "$remote_script" | base64 -w 0)
+
+          remote_command="echo '$encoded_script' | base64 -d | bash"
+
+          jq -n \
+            --arg command "$remote_command" \
+            '{commands: [$command]}' \
+            > rollback.json
+
+          command_id=$(aws ssm send-command \
+            --region "$AWS_REGION" \
+            --instance-ids "$EC2_INSTANCE_ID" \
+            --document-name AWS-RunShellScript \
+            --comment 'Rollback Meridian deployment' \
+            --parameters file://rollback.json \
+            --query 'Command.CommandId' \
+            --output text)
+
           echo "SSM rollback command ID: $command_id"
+
           for attempt in $(seq 1 60); do
-            status=$(aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query Status --output text 2>/dev/null || true)
+
+            status=$(aws ssm get-command-invocation \
+              --region "$AWS_REGION" \
+              --command-id "$command_id" \
+              --instance-id "$EC2_INSTANCE_ID" \
+              --query Status \
+              --output text 2>/dev/null || true)
+
             echo "[$attempt/60] Rollback status: ${status:-Pending}"
+
             case "$status" in
+
               Success)
-                aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query StandardOutputContent --output text
+
+                aws ssm get-command-invocation \
+                  --region "$AWS_REGION" \
+                  --command-id "$command_id" \
+                  --instance-id "$EC2_INSTANCE_ID" \
+                  --query StandardOutputContent \
+                  --output text
+
                 exit 0
                 ;;
+
               Failed|Cancelled|TimedOut|Cancelling)
-                aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query '{Status:Status,StatusDetails:StatusDetails,Output:StandardOutputContent,Error:StandardErrorContent}' --output json || true
+
+                echo "=========================================="
+                echo "ROLLBACK FAILED"
+                echo "=========================================="
+
+                aws ssm get-command-invocation \
+                  --region "$AWS_REGION" \
+                  --command-id "$command_id" \
+                  --instance-id "$EC2_INSTANCE_ID" \
+                  --query '{
+                    Status:Status,
+                    StatusDetails:StatusDetails,
+                    Output:StandardOutputContent,
+                    Error:StandardErrorContent
+                  }' \
+                  --output json || true
+
                 exit 1
                 ;;
+
               *)
                 [ "$attempt" -eq 60 ] || sleep 10
                 ;;
             esac
+
           done
-          aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query '{Status:Status,StatusDetails:StatusDetails,Output:StandardOutputContent,Error:StandardErrorContent}' --output json || true
+
           exit 1
