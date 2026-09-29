@@ -1,0 +1,962 @@
+[
+  {
+    "id": "44",
+    "messages": [
+      {
+        "id": "handoff-44-1790276537",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2286.",
+        "jiraKey": "KAN-2286",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2286",
+        "sharingLink": "https://localhost:443/sharing?c=lTojIXdhMIdq7Ihhvny3T52yOFzjRyc$3MNiH41X$jmmt1rnGroSVpjUa@Kxck4w7pYeRYEltxR4am10K7y4EkafovQaRhzx1V$shYtl7BqAaI@nuXrTUKC9yaQ=",
+        "timestamp": "2026-09-24T19:02:17.460626Z"
+      },
+      {
+        "id": "join-44-1790276540875",
+        "role": "system",
+        "kind": "engineer_joined",
+        "type": "engineer_joined",
+        "engineerName": "Alex Turner (Support Engineer)",
+        "content": "Alex Turner (Support Engineer) has connected to this support chat session.",
+        "timestamp": "2026-09-24T19:02:20.875418Z"
+      },
+      {
+        "id": "engineer-1790276542958-a91b",
+        "role": "engineer",
+        "content": "Hi Maya! Alex here from L2 IT Support. I see your audio issue on AVDGLS5-4. Connecting now.",
+        "timestamp": "2026-09-24T19:02:22.958385Z"
+      },
+      {
+        "id": "user-1790276545019-a3fa",
+        "role": "user",
+        "content": "Thank you Alex! I have the Zoom window open.",
+        "timestamp": "2026-09-24T19:02:25.019820Z"
+      }
+    ],
+    "status": "engineer_joined",
+    "title": "My Zoom audio is completely broken during all department meetings.",
+    "ticketId": "ESC-44-51F5",
+    "jiraKey": "KAN-2286",
+    "issueSummary": "My Zoom audio is completely broken during all department meetings.",
+    "sharingLink": "https://localhost:443/sharing?c=lTojIXdhMIdq7Ihhvny3T52yOFzjRyc$3MNiH41X$jmmt1rnGroSVpjUa@Kxck4w7pYeRYEltxR4am10K7y4EkafovQaRhzx1V$shYtl7BqAaI@nuXrTUKC9yaQ=",
+    "chatLink": "http://localhost:8001/support/chat/44",
+    "engineerJoined": true,
+    "engineerJoinedAt": "2026-09-24T19:02:20.875418Z",
+    "engineerName": "Alex Turner (Support Engineer)",
+    "createdAt": null
+  },
+  {
+    "id": "46",
+    "messages": [
+      {
+        "id": "handoff-46-1790277072",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2055.",
+        "jiraKey": "KAN-2055",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2055",
+        "sharingLink": "https://localhost:443/sharing?c=F4EjEfs@ErgvMoARr9yaUr@Tdpeyvgr7BBgQWyVWRIpB@oCnYLVOvKH@OxMDkdjgiZcds3IFjGaFVUVigdiFR4tchW3Fpj5HL4tRREnF8oV5QZBL7nai@mm1Ljc=",
+        "timestamp": "2026-09-24T19:11:12.432227Z"
+      },
+      {
+        "id": "join-46-1790277081142",
+        "role": "system",
+        "kind": "engineer_joined",
+        "type": "engineer_joined",
+        "engineerName": "Alex Turner (Support Engineer)",
+        "content": "Alex Turner (Support Engineer) has connected to this support chat session.",
+        "timestamp": "2026-09-24T19:11:21.142570Z"
+      },
+      {
+        "id": "engineer-1790277083216-0868",
+        "role": "engineer",
+        "content": "Hi Maya! This is Alex from L2 Support. I reviewed your ticket and have remote desktop access ready. Can I proceed with checking your Zoom system logs?",
+        "timestamp": "2026-09-24T19:11:23.216400Z"
+      },
+      {
+        "id": "user-1790277087320-9faa",
+        "role": "user",
+        "content": "Yes Alex, please go ahead. Thank you for your quick help!",
+        "timestamp": "2026-09-24T19:11:27.320191Z"
+      }
+    ],
+    "status": "engineer_joined",
+    "title": "My Zoom keeps crashing when I open it. Can you help me fix it?",
+    "ticketId": "ESC-46-5C70",
+    "jiraKey": "KAN-2055",
+    "issueSummary": "My Zoom keeps crashing when I open it. Can you help me fix it?",
+    "sharingLink": "https://localhost:443/sharing?c=F4EjEfs@ErgvMoARr9yaUr@Tdpeyvgr7BBgQWyVWRIpB@oCnYLVOvKH@OxMDkdjgiZcds3IFjGaFVUVigdiFR4tchW3Fpj5HL4tRREnF8oV5QZBL7nai@mm1Ljc=",
+    "chatLink": "http://localhost:8001/support/chat/46",
+    "engineerJoined": true,
+    "engineerJoinedAt": "2026-09-24T19:11:21.142570Z",
+    "engineerName": "Alex Turner (Support Engineer)",
+    "createdAt": null
+  },
+  {
+    "id": "47",
+    "messages": [
+      {
+        "id": "handoff-47-1790277103",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2103.",
+        "jiraKey": "KAN-2103",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2103",
+        "sharingLink": "https://localhost:443/sharing?c=bC7Z$UZI9JqVCnjDYXUKGJQocGrAE0IR0EwcvPqcJS3KvNmwfdFNTZq@ndApVJpscdTi5KDaO@9ZVAkSGnQ70ZcMoVUTy7$vT46mHvJPLsVMoD@iyIvIORF2XLQ=",
+        "timestamp": "2026-09-24T19:11:43.553106Z"
+      },
+      {
+        "id": "join-47-1790277106691",
+        "role": "system",
+        "kind": "engineer_joined",
+        "type": "engineer_joined",
+        "engineerName": "Alex Turner (Support Engineer)",
+        "content": "Alex Turner (Support Engineer) has connected to this support chat session.",
+        "timestamp": "2026-09-24T19:11:46.691603Z"
+      },
+      {
+        "id": "engineer-1790277108768-c83d",
+        "role": "engineer",
+        "content": "Hi Maya! Alex here from L2 IT Support. I see your audio issue on AVDGLS5-4. Connecting now.",
+        "timestamp": "2026-09-24T19:11:48.768323Z"
+      },
+      {
+        "id": "user-1790277110832-f37c",
+        "role": "user",
+        "content": "Thank you Alex! I have the Zoom window open.",
+        "timestamp": "2026-09-24T19:11:50.832955Z"
+      }
+    ],
+    "status": "engineer_joined",
+    "title": "My Zoom audio is completely broken during all department meetings.",
+    "ticketId": "ESC-47-1333",
+    "jiraKey": "KAN-2103",
+    "issueSummary": "My Zoom audio is completely broken during all department meetings.",
+    "sharingLink": "https://localhost:443/sharing?c=bC7Z$UZI9JqVCnjDYXUKGJQocGrAE0IR0EwcvPqcJS3KvNmwfdFNTZq@ndApVJpscdTi5KDaO@9ZVAkSGnQ70ZcMoVUTy7$vT46mHvJPLsVMoD@iyIvIORF2XLQ=",
+    "chatLink": "http://localhost:8001/support/chat/47",
+    "engineerJoined": true,
+    "engineerJoinedAt": "2026-09-24T19:11:46.691603Z",
+    "engineerName": "Alex Turner (Support Engineer)",
+    "createdAt": null
+  },
+  {
+    "id": "48",
+    "messages": [
+      {
+        "id": "handoff-48-1790311052",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2471.",
+        "jiraKey": "KAN-2471",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2471",
+        "sharingLink": "https://localhost:443/sharing?c=UzEC5EOZytHKJCgAZqABAjKbzllsQvUDqWH1iq$7YzdG8q1n9V70q3wbXFRBYMud1IjK7TjBr$HddHk6NV9EvQH4s0mshjPTGb6E1$ovscvnLJdPSaimuP887@g=",
+        "timestamp": "2026-09-25T04:37:32.525482Z"
+      },
+      {
+        "id": "join-48-1790311064706",
+        "role": "system",
+        "kind": "engineer_joined",
+        "type": "engineer_joined",
+        "engineerName": "Alex Turner (Support Engineer)",
+        "content": "Alex Turner (Support Engineer) has connected to this support chat session.",
+        "timestamp": "2026-09-25T04:37:44.706420Z"
+      },
+      {
+        "id": "engineer-1790311067022-960a",
+        "role": "engineer",
+        "content": "Hi Maya! This is Alex from L2 Support. I reviewed your ticket and have remote desktop access ready. Can I proceed with checking your Zoom system logs?",
+        "timestamp": "2026-09-25T04:37:47.022189Z"
+      },
+      {
+        "id": "user-1790311071138-3aa2",
+        "role": "user",
+        "content": "Yes Alex, please go ahead. Thank you for your quick help!",
+        "timestamp": "2026-09-25T04:37:51.138185Z"
+      }
+    ],
+    "status": "engineer_joined",
+    "title": "My Zoom keeps crashing when I open it. Can you help me fix it?",
+    "ticketId": "ESC-48-A209",
+    "jiraKey": "KAN-2471",
+    "issueSummary": "My Zoom keeps crashing when I open it. Can you help me fix it?",
+    "sharingLink": "https://localhost:443/sharing?c=UzEC5EOZytHKJCgAZqABAjKbzllsQvUDqWH1iq$7YzdG8q1n9V70q3wbXFRBYMud1IjK7TjBr$HddHk6NV9EvQH4s0mshjPTGb6E1$ovscvnLJdPSaimuP887@g=",
+    "chatLink": "http://localhost:8001/support/chat/48",
+    "engineerJoined": true,
+    "engineerJoinedAt": "2026-09-25T04:37:44.706420Z",
+    "engineerName": "Alex Turner (Support Engineer)",
+    "createdAt": null
+  },
+  {
+    "id": "49",
+    "messages": [
+      {
+        "id": "handoff-49-1790311098",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2533.",
+        "jiraKey": "KAN-2533",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2533",
+        "sharingLink": "https://localhost:443/sharing?c=c5FQtxA1nafNoe7Xl8z6Bdte3q1vt1RIvzlJAt62PATBxD$JOREUx@@JPpJ4AcSMJn6dPIrowhJ65hOgjP8ByHZORUW6SErUR3m8jP8lhl0DXhnfIa@KQ1nuY1g=",
+        "timestamp": "2026-09-25T04:38:18.374833Z"
+      },
+      {
+        "id": "join-49-1790311102184",
+        "role": "system",
+        "kind": "engineer_joined",
+        "type": "engineer_joined",
+        "engineerName": "Alex Turner (Support Engineer)",
+        "content": "Alex Turner (Support Engineer) has connected to this support chat session.",
+        "timestamp": "2026-09-25T04:38:22.184144Z"
+      },
+      {
+        "id": "engineer-1790311104258-5089",
+        "role": "engineer",
+        "content": "Hi Maya! Alex here from L2 IT Support. I see your audio issue on AVDGLS5-4. Connecting now.",
+        "timestamp": "2026-09-25T04:38:24.258963Z"
+      },
+      {
+        "id": "user-1790311106325-756e",
+        "role": "user",
+        "content": "Thank you Alex! I have the Zoom window open.",
+        "timestamp": "2026-09-25T04:38:26.325374Z"
+      },
+      {
+        "id": "user-1790313841859-2872",
+        "role": "user",
+        "content": "Hi",
+        "timestamp": "2026-09-25T05:24:01.859164Z"
+      }
+    ],
+    "status": "engineer_joined",
+    "title": "My Zoom audio is completely broken during all department meetings.",
+    "ticketId": "ESC-49-DEEE",
+    "jiraKey": "KAN-2533",
+    "issueSummary": "My Zoom audio is completely broken during all department meetings.",
+    "sharingLink": "https://localhost:443/sharing?c=c5FQtxA1nafNoe7Xl8z6Bdte3q1vt1RIvzlJAt62PATBxD$JOREUx@@JPpJ4AcSMJn6dPIrowhJ65hOgjP8ByHZORUW6SErUR3m8jP8lhl0DXhnfIa@KQ1nuY1g=",
+    "chatLink": "http://localhost:8001/support/chat/49",
+    "engineerJoined": true,
+    "engineerJoinedAt": "2026-09-25T04:38:22.184144Z",
+    "engineerName": "Alex Turner (Support Engineer)",
+    "createdAt": null
+  },
+  {
+    "id": "50",
+    "messages": [
+      {
+        "id": "handoff-50-1790314934",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2387.",
+        "jiraKey": "KAN-2387",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2387",
+        "sharingLink": "https://localhost:443/sharing?c=Du@yn9y7ZQOwG9$OshTOW@xVoWhtffqDNRGb1E9TAj0fG76oLYjp7kciPT3J@X8L58JOilpk0fs2ZDVAPsLTNhpUrUP3ut7p94N7P27aGmYcwv8w8cKY0u9koa4=",
+        "timestamp": "2026-09-25T05:42:14.958450Z"
+      },
+      {
+        "id": "join-50-1790314947752",
+        "role": "system",
+        "kind": "engineer_joined",
+        "type": "engineer_joined",
+        "engineerName": "Alex Turner (Support Engineer)",
+        "content": "Alex Turner (Support Engineer) has connected to this support chat session.",
+        "timestamp": "2026-09-25T05:42:27.752344Z"
+      },
+      {
+        "id": "engineer-1790314951762-f2e2",
+        "role": "engineer",
+        "content": "Hi Maya! This is Alex from L2 Support. I reviewed your ticket and have remote desktop access ready. Can I proceed with checking your Zoom system logs?",
+        "timestamp": "2026-09-25T05:42:31.762610Z"
+      },
+      {
+        "id": "user-1790314955868-a043",
+        "role": "user",
+        "content": "Yes Alex, please go ahead. Thank you for your quick help!",
+        "timestamp": "2026-09-25T05:42:35.868092Z"
+      }
+    ],
+    "status": "engineer_joined",
+    "title": "My Zoom keeps crashing when I open it. Can you help me fix it?",
+    "ticketId": "ESC-50-7325",
+    "jiraKey": "KAN-2387",
+    "issueSummary": "My Zoom keeps crashing when I open it. Can you help me fix it?",
+    "sharingLink": "https://localhost:443/sharing?c=Du@yn9y7ZQOwG9$OshTOW@xVoWhtffqDNRGb1E9TAj0fG76oLYjp7kciPT3J@X8L58JOilpk0fs2ZDVAPsLTNhpUrUP3ut7p94N7P27aGmYcwv8w8cKY0u9koa4=",
+    "chatLink": "http://localhost:8001/support/chat/50",
+    "engineerJoined": true,
+    "engineerJoinedAt": "2026-09-28T09:10:33.458923Z",
+    "engineerName": "Alex Turner (Support Engineer)",
+    "createdAt": null
+  },
+  {
+    "id": "51",
+    "messages": [
+      {
+        "id": "handoff-51-1790314949",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2418.",
+        "jiraKey": "KAN-2418",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2418",
+        "sharingLink": "https://localhost:443/sharing?c=ODT$UVBVer1c4uL@cpuhKBrGADC1TstuVhFbSKNCmBDaKlpF5byqJQBrm7n6KKOG0KkVo8ADijDPq6E$Yi3YEZGoWqO476z5AskYoFm9dzGFzYPF7Rp$0hh4G1Y=",
+        "timestamp": "2026-09-25T05:42:29.796825Z"
+      },
+      {
+        "id": "join-51-1790314953791",
+        "role": "system",
+        "kind": "engineer_joined",
+        "type": "engineer_joined",
+        "engineerName": "Alex Turner (Support Engineer)",
+        "content": "Alex Turner (Support Engineer) has connected to this support chat session.",
+        "timestamp": "2026-09-25T05:42:33.791876Z"
+      },
+      {
+        "id": "engineer-1790314955884-f7af",
+        "role": "engineer",
+        "content": "Hi Maya! Alex here from L2 IT Support. I see your audio issue on AVDGLS5-4. Connecting now.",
+        "timestamp": "2026-09-25T05:42:35.884547Z"
+      },
+      {
+        "id": "user-1790314957936-1459",
+        "role": "user",
+        "content": "Thank you Alex! I have the Zoom window open.",
+        "timestamp": "2026-09-25T05:42:37.936222Z"
+      }
+    ],
+    "status": "engineer_joined",
+    "title": "My Zoom audio is completely broken during all department meetings.",
+    "ticketId": "ESC-51-83EF",
+    "jiraKey": "KAN-2418",
+    "issueSummary": "My Zoom audio is completely broken during all department meetings.",
+    "sharingLink": "https://localhost:443/sharing?c=ODT$UVBVer1c4uL@cpuhKBrGADC1TstuVhFbSKNCmBDaKlpF5byqJQBrm7n6KKOG0KkVo8ADijDPq6E$Yi3YEZGoWqO476z5AskYoFm9dzGFzYPF7Rp$0hh4G1Y=",
+    "chatLink": "http://localhost:8001/support/chat/51",
+    "engineerJoined": true,
+    "engineerJoinedAt": "2026-09-25T05:42:33.791876Z",
+    "engineerName": "Alex Turner (Support Engineer)",
+    "createdAt": null
+  },
+  {
+    "id": "52",
+    "messages": [
+      {
+        "id": "handoff-52-1790314971",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2456.",
+        "jiraKey": "KAN-2456",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2456",
+        "sharingLink": "https://localhost:443/sharing?c=5NgQEPWbpVVyxwKZ1rz4nXU1o3dAcVEkX2WfweMGU0kIEdoWs@Rk12HvqK0WEmqezGSD7TZrppgIhDDCJ21EZS0QQzYXB2jk1C7mkv$AGi0Hbdh2JX8pQTdA2pA=",
+        "timestamp": "2026-09-25T05:42:51.315551Z"
+      },
+      {
+        "id": "join-52-1790314974902",
+        "role": "system",
+        "kind": "engineer_joined",
+        "type": "engineer_joined",
+        "engineerName": "Alex Turner (Support Engineer)",
+        "content": "Alex Turner (Support Engineer) has connected to this support chat session.",
+        "timestamp": "2026-09-25T05:42:54.902739Z"
+      },
+      {
+        "id": "engineer-1790314976969-30c0",
+        "role": "engineer",
+        "content": "Hi Maya! Alex here from L2 IT Support. I see your audio issue on AVDGLS5-4. Connecting now.",
+        "timestamp": "2026-09-25T05:42:56.969540Z"
+      },
+      {
+        "id": "user-1790314979023-f756",
+        "role": "user",
+        "content": "Thank you Alex! I have the Zoom window open.",
+        "timestamp": "2026-09-25T05:42:59.023170Z"
+      }
+    ],
+    "status": "engineer_joined",
+    "title": "My Zoom audio is completely broken during all department meetings.",
+    "ticketId": "ESC-52-B89E",
+    "jiraKey": "KAN-2456",
+    "issueSummary": "My Zoom audio is completely broken during all department meetings.",
+    "sharingLink": "https://localhost:443/sharing?c=5NgQEPWbpVVyxwKZ1rz4nXU1o3dAcVEkX2WfweMGU0kIEdoWs@Rk12HvqK0WEmqezGSD7TZrppgIhDDCJ21EZS0QQzYXB2jk1C7mkv$AGi0Hbdh2JX8pQTdA2pA=",
+    "chatLink": "http://localhost:8001/support/chat/52",
+    "engineerJoined": true,
+    "engineerJoinedAt": "2026-09-25T05:42:54.902739Z",
+    "engineerName": "Alex Turner (Support Engineer)",
+    "createdAt": null
+  },
+  {
+    "id": "53",
+    "messages": [
+      {
+        "id": "handoff-53-1790317505",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2608.",
+        "jiraKey": "KAN-2608",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2608",
+        "sharingLink": "https://localhost:443/sharing?c=1ABs0S$EIqQ2L62W$9bzymVgYWg4NHDqqijuaYDHrN2zek1Ui0CksR8RrLnT8D8XH2kKle2ajGFa6p54e9VDQObfB@cUiEDAeetmAAtqO5fFcjq$khW4lQ@scXs=",
+        "timestamp": "2026-09-25T06:25:05.267882Z"
+      },
+      {
+        "id": "join-53-1790317512595",
+        "role": "system",
+        "kind": "engineer_joined",
+        "type": "engineer_joined",
+        "engineerName": "Alex Turner (Support Engineer)",
+        "content": "Alex Turner (Support Engineer) has connected to this support chat session.",
+        "timestamp": "2026-09-25T06:25:12.595335Z"
+      }
+    ],
+    "status": "engineer_joined",
+    "title": "My Zoom keeps freezing during screen share",
+    "ticketId": "ESC-53-A4C2",
+    "jiraKey": "KAN-2608",
+    "issueSummary": "My Zoom keeps freezing during screen share",
+    "sharingLink": "https://localhost:443/sharing?c=1ABs0S$EIqQ2L62W$9bzymVgYWg4NHDqqijuaYDHrN2zek1Ui0CksR8RrLnT8D8XH2kKle2ajGFa6p54e9VDQObfB@cUiEDAeetmAAtqO5fFcjq$khW4lQ@scXs=",
+    "chatLink": "http://localhost:8001/support/chat/53",
+    "engineerJoined": true,
+    "engineerJoinedAt": "2026-09-25T06:25:12.595335Z",
+    "engineerName": "Alex Turner (Support Engineer)",
+    "createdAt": null
+  },
+  {
+    "id": "54",
+    "messages": [
+      {
+        "id": "handoff-54-1790317602",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-1921.",
+        "jiraKey": "KAN-1921",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-1921",
+        "sharingLink": "https://localhost:443/sharing?c=H34D3psDzNNmTlaW6IPS8T$Hzzxjpfx2gfuvSQv0phAyxaZglm$Un8bce0UIBKKuKuVs0$0hCBC9B0icLKOj8CyIxNRGhzf6$cJzSGc79Fn9N6h3fx0WTqOgv0Y=",
+        "timestamp": "2026-09-25T06:26:42.447730Z"
+      },
+      {
+        "id": "join-54-1790317608001",
+        "role": "system",
+        "kind": "engineer_joined",
+        "type": "engineer_joined",
+        "engineerName": "Alex Turner (Support Engineer)",
+        "content": "Alex Turner (Support Engineer) has connected to this support chat session.",
+        "timestamp": "2026-09-25T06:26:48.001104Z"
+      },
+      {
+        "id": "engineer-1790317610086-fa98",
+        "role": "engineer",
+        "content": "Hello Maya, I am looking into your Zoom issue now.",
+        "timestamp": "2026-09-25T06:26:50.086481Z"
+      }
+    ],
+    "status": "engineer_joined",
+    "title": "My Zoom keeps freezing during screen share",
+    "ticketId": "ESC-54-30A8",
+    "jiraKey": "KAN-1921",
+    "issueSummary": "My Zoom keeps freezing during screen share",
+    "sharingLink": "https://localhost:443/sharing?c=H34D3psDzNNmTlaW6IPS8T$Hzzxjpfx2gfuvSQv0phAyxaZglm$Un8bce0UIBKKuKuVs0$0hCBC9B0icLKOj8CyIxNRGhzf6$cJzSGc79Fn9N6h3fx0WTqOgv0Y=",
+    "chatLink": "http://localhost:8001/support/chat/54",
+    "engineerJoined": true,
+    "engineerJoinedAt": "2026-09-25T06:26:48.001104Z",
+    "engineerName": "Alex Turner (Support Engineer)",
+    "createdAt": null
+  },
+  {
+    "id": "56",
+    "messages": [
+      {
+        "id": "handoff-56-1790317947",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2300.",
+        "jiraKey": "KAN-2300",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2300",
+        "sharingLink": "https://localhost:443/sharing?c=sfdLX3iNUeq6gBog9h$pc$iRf2H@SdeuiZg55yUuRS3qdJvygV7l7BuBRuTZVcyxtsR6VEIVz9f6VWm73IfXzKWqOVKk1hU$i1mQnzY$xe8@rJDLv9dJhUUetzk=",
+        "timestamp": "2026-09-25T06:32:27.033878Z"
+      }
+    ],
+    "status": "escalated",
+    "title": "My Zoom keeps freezing during screen share",
+    "ticketId": "ESC-56-8C1A",
+    "jiraKey": "KAN-2300",
+    "issueSummary": "My Zoom keeps freezing during screen share",
+    "sharingLink": "https://localhost:443/sharing?c=sfdLX3iNUeq6gBog9h$pc$iRf2H@SdeuiZg55yUuRS3qdJvygV7l7BuBRuTZVcyxtsR6VEIVz9f6VWm73IfXzKWqOVKk1hU$i1mQnzY$xe8@rJDLv9dJhUUetzk=",
+    "chatLink": "http://localhost:8001/support/chat/56",
+    "engineerJoined": false,
+    "engineerJoinedAt": null,
+    "engineerName": null,
+    "createdAt": null
+  },
+  {
+    "id": "57",
+    "messages": [
+      {
+        "id": "handoff-57-1790318313",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2683.",
+        "jiraKey": "KAN-2683",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2683",
+        "sharingLink": "https://localhost:443/sharing?c=2R7NOFlEgklYJQq8i81N7$WjvR9gAep$hg5gUurPbqMNJ@KDOVEE2J1o3avZgOJVN6zIuLY2x5lpi1M8Q6xnel@gi1M32LGXUhu@$I7u1qlsMRxQbezFF2tdk14=",
+        "timestamp": "2026-09-25T06:38:33.126066Z"
+      },
+      {
+        "id": "join-57-1790318319064",
+        "role": "system",
+        "kind": "engineer_joined",
+        "type": "engineer_joined",
+        "engineerName": "Alex Turner (Support Engineer)",
+        "content": "Alex Turner (Support Engineer) has connected to this support chat session.",
+        "timestamp": "2026-09-25T06:38:39.064068Z"
+      },
+      {
+        "id": "engineer-1790318321115-5d55",
+        "role": "engineer",
+        "content": "Hello Maya, I am looking into your Zoom issue now.",
+        "timestamp": "2026-09-25T06:38:41.115487Z"
+      }
+    ],
+    "status": "engineer_joined",
+    "title": "My Zoom keeps freezing during screen share",
+    "ticketId": "ESC-57-3129",
+    "jiraKey": "KAN-2683",
+    "issueSummary": "My Zoom keeps freezing during screen share",
+    "sharingLink": "https://localhost:443/sharing?c=2R7NOFlEgklYJQq8i81N7$WjvR9gAep$hg5gUurPbqMNJ@KDOVEE2J1o3avZgOJVN6zIuLY2x5lpi1M8Q6xnel@gi1M32LGXUhu@$I7u1qlsMRxQbezFF2tdk14=",
+    "chatLink": "http://localhost:8001/support/chat/57",
+    "engineerJoined": true,
+    "engineerJoinedAt": "2026-09-25T06:38:39.064068Z",
+    "engineerName": "Alex Turner (Support Engineer)",
+    "createdAt": null
+  },
+  {
+    "id": "61",
+    "messages": [
+      {
+        "id": "handoff-61-1790321180",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2419.",
+        "jiraKey": "KAN-2419",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2419",
+        "sharingLink": "https://localhost:443/sharing?c=8BCF$nL$9zb1uRkN1btYr9i@BQZjBKCqbDcLUMgDrTS4VwhkvxqyWQjXb4RLpKCVrzi4dqM7OlslK6Ph2AbOBDuCDugR1saD8W3ehvqGc$bk4qMwp12Yj6WgBhc=",
+        "timestamp": "2026-09-25T07:26:20.256787Z"
+      }
+    ],
+    "status": "escalated",
+    "title": "My Zoom keeps freezing during screen share",
+    "ticketId": "ESC-61-B7E7",
+    "jiraKey": "KAN-2419",
+    "issueSummary": "My Zoom keeps freezing during screen share",
+    "sharingLink": "https://localhost:443/sharing?c=8BCF$nL$9zb1uRkN1btYr9i@BQZjBKCqbDcLUMgDrTS4VwhkvxqyWQjXb4RLpKCVrzi4dqM7OlslK6Ph2AbOBDuCDugR1saD8W3ehvqGc$bk4qMwp12Yj6WgBhc=",
+    "chatLink": "http://localhost:8001/support/chat/61",
+    "engineerJoined": false,
+    "engineerJoinedAt": null,
+    "engineerName": null,
+    "createdAt": null
+  },
+  {
+    "id": "63",
+    "messages": [
+      {
+        "id": "handoff-63-1790323103",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2776.",
+        "jiraKey": "KAN-2776",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2776",
+        "sharingLink": "https://localhost:443/sharing?c=9X7k6oSPeUQtTp@bn1t77Tkb75e$EV$VxEe@DWJam@92IOFJjpUDts9mcvfU1gIcVvX0KrntjPLBoQZGU1tzTYFSHTVw9rvjDEwKdLkFpWWkRZUwaVJJwDFoja8=",
+        "timestamp": "2026-09-25T07:58:23.573295Z"
+      }
+    ],
+    "status": "escalated",
+    "title": "My Zoom keeps freezing during screen share",
+    "ticketId": "ESC-63-44DC",
+    "jiraKey": "KAN-2776",
+    "issueSummary": "My Zoom keeps freezing during screen share",
+    "sharingLink": "https://localhost:443/sharing?c=9X7k6oSPeUQtTp@bn1t77Tkb75e$EV$VxEe@DWJam@92IOFJjpUDts9mcvfU1gIcVvX0KrntjPLBoQZGU1tzTYFSHTVw9rvjDEwKdLkFpWWkRZUwaVJJwDFoja8=",
+    "chatLink": "http://localhost:8001/support/chat/63",
+    "engineerJoined": false,
+    "engineerJoinedAt": null,
+    "engineerName": null,
+    "createdAt": null
+  },
+  {
+    "id": "65",
+    "messages": [
+      {
+        "id": "handoff-65-1790323423",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2330.",
+        "jiraKey": "KAN-2330",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2330",
+        "sharingLink": "https://localhost:443/sharing?c=5iMnFkSYA7mdlTiXu3L4lMV2jgWSvTw9xOP6ZJiEQIOqLboEO4x1sY0EJmB67701eTYvWWwfTRuw7eqJrwKGpYhllznURrZAXZcBxLeRmOYoURWzuxp9UZ9SNpc=",
+        "timestamp": "2026-09-25T08:03:43.496650Z"
+      }
+    ],
+    "status": "escalated",
+    "title": "No, that didn't resolve my issue, please escalate",
+    "ticketId": "ESC-65-BD03",
+    "jiraKey": "KAN-2330",
+    "issueSummary": "No, that didn't resolve my issue, please escalate",
+    "sharingLink": "https://localhost:443/sharing?c=5iMnFkSYA7mdlTiXu3L4lMV2jgWSvTw9xOP6ZJiEQIOqLboEO4x1sY0EJmB67701eTYvWWwfTRuw7eqJrwKGpYhllznURrZAXZcBxLeRmOYoURWzuxp9UZ9SNpc=",
+    "chatLink": "http://localhost:8001/support/chat/65",
+    "engineerJoined": false,
+    "engineerJoinedAt": null,
+    "engineerName": null,
+    "createdAt": null
+  },
+  {
+    "id": "66",
+    "messages": [
+      {
+        "id": "handoff-66-1790324690",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2813.",
+        "jiraKey": "KAN-2813",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2813",
+        "sharingLink": "https://localhost:443/sharing?c=6VcLGI6W1qn0GIVldx0093HEoxnsD1MayfGp7chvZfMFpN2lKp3kjpDsbKmA1zqIIelohYHItGEdll9hp3UHrtPWK1@3fr79bigwFbhZ5ZRN98Wihp8FTjX9V7c=",
+        "timestamp": "2026-09-25T08:24:50.380853Z"
+      }
+    ],
+    "status": "escalated",
+    "title": "My Zoom keeps crashing when I open it. Can you help me fix it?",
+    "ticketId": "ESC-66-AE08",
+    "jiraKey": "KAN-2813",
+    "issueSummary": "My Zoom keeps crashing when I open it. Can you help me fix it?",
+    "sharingLink": "https://localhost:443/sharing?c=6VcLGI6W1qn0GIVldx0093HEoxnsD1MayfGp7chvZfMFpN2lKp3kjpDsbKmA1zqIIelohYHItGEdll9hp3UHrtPWK1@3fr79bigwFbhZ5ZRN98Wihp8FTjX9V7c=",
+    "chatLink": "http://localhost:8001/support/chat/66",
+    "engineerJoined": false,
+    "engineerJoinedAt": null,
+    "engineerName": null,
+    "createdAt": null
+  },
+  {
+    "id": "67",
+    "messages": [
+      {
+        "id": "handoff-67-1790324958",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2298.",
+        "jiraKey": "KAN-2298",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2298",
+        "sharingLink": "https://localhost:443/sharing?c=nVDwFXBmg0x8qvS9ah1uxTjec9QhgsFHasTxozj9JS@CvL$P9CzUzMmcIePXFW0rfeEtQ6bB6NskqYCwwg4bIyeLuJdbw$3Sq96AtOHOS@@mbYyq7tJoHM8Ktjw=",
+        "timestamp": "2026-09-25T08:29:18.844094Z"
+      },
+      {
+        "id": "join-67-1790324967401",
+        "role": "system",
+        "kind": "engineer_joined",
+        "type": "engineer_joined",
+        "engineerName": "Alex Turner (Support Engineer)",
+        "content": "Alex Turner (Support Engineer) has connected to this support chat session.",
+        "timestamp": "2026-09-25T08:29:27.401003Z"
+      },
+      {
+        "id": "engineer-1790324969466-76e4",
+        "role": "engineer",
+        "content": "Hi Maya! This is Alex from L2 Support. I reviewed your ticket and have remote desktop access ready. Can I proceed with checking your Zoom system logs?",
+        "timestamp": "2026-09-25T08:29:29.466513Z"
+      },
+      {
+        "id": "user-1790324973572-f874",
+        "role": "user",
+        "content": "Yes Alex, please go ahead. Thank you for your quick help!",
+        "timestamp": "2026-09-25T08:29:33.572050Z"
+      }
+    ],
+    "status": "engineer_joined",
+    "title": "My Zoom keeps crashing when I open it. Can you help me fix it?",
+    "ticketId": "ESC-67-CCD0",
+    "jiraKey": "KAN-2298",
+    "issueSummary": "My Zoom keeps crashing when I open it. Can you help me fix it?",
+    "sharingLink": "https://localhost:443/sharing?c=nVDwFXBmg0x8qvS9ah1uxTjec9QhgsFHasTxozj9JS@CvL$P9CzUzMmcIePXFW0rfeEtQ6bB6NskqYCwwg4bIyeLuJdbw$3Sq96AtOHOS@@mbYyq7tJoHM8Ktjw=",
+    "chatLink": "http://localhost:8001/support/chat/67",
+    "engineerJoined": true,
+    "engineerJoinedAt": "2026-09-28T09:10:12.613620Z",
+    "engineerName": "Alex Turner (Support Engineer)",
+    "createdAt": null
+  },
+  {
+    "id": "71",
+    "messages": [
+      {
+        "id": "handoff-71-1790325040",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2449.",
+        "jiraKey": "KAN-2449",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2449",
+        "sharingLink": "https://localhost:443/sharing?c=uJ2aAx30UG@784NBKqtbdUlYaQ6VERfTsYir4z5gvHhd7ix0fMg25O9Z5rnRxZwFXMakAp6v7C@AUGjKsBZD2X9bWWZPsCdyRflcL6I4wRTgpKXF6aUSbTUd@L0=",
+        "timestamp": "2026-09-25T08:30:40.986232Z"
+      }
+    ],
+    "status": "escalated",
+    "title": "Please escalate this to a human support engineer",
+    "ticketId": "ESC-71-5A11",
+    "jiraKey": "KAN-2449",
+    "issueSummary": "Please escalate this to a human support engineer",
+    "sharingLink": "https://localhost:443/sharing?c=uJ2aAx30UG@784NBKqtbdUlYaQ6VERfTsYir4z5gvHhd7ix0fMg25O9Z5rnRxZwFXMakAp6v7C@AUGjKsBZD2X9bWWZPsCdyRflcL6I4wRTgpKXF6aUSbTUd@L0=",
+    "chatLink": "http://localhost:8001/support/chat/71",
+    "engineerJoined": false,
+    "engineerJoinedAt": null,
+    "engineerName": null,
+    "createdAt": null
+  },
+  {
+    "id": "77",
+    "messages": [
+      {
+        "id": "handoff-77-1790331428",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2539.",
+        "jiraKey": "KAN-2539",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2539",
+        "sharingLink": "https://localhost:443/sharing?c=ihYbhJZsQ6g0uCrW7b@@o2zXj7kSAibn0coO@u5hUuYpLkW0a8JttaV9I@OvVMhLJYuEZ5tByv1d6v1kvWIXQ6UQn6eEtYNjcAnprju1sN7CT$XMYouhGQ2I75A=",
+        "timestamp": "2026-09-25T10:17:08.437026Z"
+      },
+      {
+        "id": "join-77-1790331495513",
+        "role": "system",
+        "kind": "engineer_joined",
+        "type": "engineer_joined",
+        "engineerName": "Alex Turner (Support Engineer)",
+        "content": "Alex Turner (Support Engineer) has connected to this support chat session.",
+        "timestamp": "2026-09-25T10:18:15.513546Z"
+      },
+      {
+        "id": "engineer-1790331546494-c438",
+        "role": "engineer",
+        "content": "Hello Maya",
+        "timestamp": "2026-09-25T10:19:06.494448Z"
+      },
+      {
+        "id": "user-1790331569829-e4a5",
+        "role": "user",
+        "content": "hi",
+        "timestamp": "2026-09-25T10:19:29.829160Z"
+      },
+      {
+        "id": "engineer-1790331594148-bb2c",
+        "role": "engineer",
+        "content": "what is your issue?",
+        "timestamp": "2026-09-25T10:19:54.148934Z"
+      },
+      {
+        "id": "user-1790331735461-4e0f",
+        "role": "user",
+        "content": "webcam not working",
+        "timestamp": "2026-09-25T10:22:15.461090Z"
+      },
+      {
+        "id": "engineer-1790331752916-fe28",
+        "role": "engineer",
+        "content": "okay let me check on your device",
+        "timestamp": "2026-09-25T10:22:32.916411Z"
+      },
+      {
+        "id": "engineer-1790331801630-6bee",
+        "role": "engineer",
+        "content": "Issue resolved, closing",
+        "timestamp": "2026-09-25T10:23:21.630686Z"
+      },
+      {
+        "id": "user-1790331810015-3e06",
+        "role": "user",
+        "content": "okay",
+        "timestamp": "2026-09-25T10:23:30.015281Z"
+      }
+    ],
+    "status": "engineer_joined",
+    "title": "hii",
+    "ticketId": "ESC-77-9959",
+    "jiraKey": "KAN-2539",
+    "issueSummary": "hii",
+    "sharingLink": "https://localhost:443/sharing?c=ihYbhJZsQ6g0uCrW7b@@o2zXj7kSAibn0coO@u5hUuYpLkW0a8JttaV9I@OvVMhLJYuEZ5tByv1d6v1kvWIXQ6UQn6eEtYNjcAnprju1sN7CT$XMYouhGQ2I75A=",
+    "chatLink": "http://localhost:8001/support/chat/77",
+    "engineerJoined": true,
+    "engineerJoinedAt": "2026-09-25T10:21:12.702434Z",
+    "engineerName": "Alex Turner (Support Engineer)",
+    "createdAt": null
+  },
+  {
+    "id": "90",
+    "messages": [
+      {
+        "id": "handoff-90-1790578753",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2885.",
+        "jiraKey": "KAN-2885",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2885",
+        "sharingLink": "https://localhost:443/sharing?c=Bu3@V8kY0sV8yQX3AhFM2ZmhyVIOuOPyhVYAdoqOHp6lP$$l6hczA7excRopeqgjAucTDMW5p9uFt9RN70BqITgyC5bqtGM7IDRZEGcBYUnWxLZFoVjeESLEH18=",
+        "timestamp": "2026-09-28T06:59:13.599786Z"
+      },
+      {
+        "id": "join-90-1790578810637",
+        "role": "system",
+        "kind": "engineer_joined",
+        "type": "engineer_joined",
+        "engineerName": "Alex Turner (Support Engineer)",
+        "content": "Alex Turner (Support Engineer) has connected to this support chat session.",
+        "timestamp": "2026-09-28T07:00:10.637063Z"
+      },
+      {
+        "id": "engineer-1790578879169-7e3f",
+        "role": "engineer",
+        "content": "Hi Maya",
+        "timestamp": "2026-09-28T07:01:19.169426Z"
+      },
+      {
+        "id": "user-1790578958221-206b",
+        "role": "user",
+        "content": "I am not able to fix my webcam issue. Please help",
+        "timestamp": "2026-09-28T07:02:38.221677Z"
+      },
+      {
+        "id": "engineer-1790578987313-a1af",
+        "role": "engineer",
+        "content": "Okay looking into your system",
+        "timestamp": "2026-09-28T07:03:07.313798Z"
+      }
+    ],
+    "status": "engineer_joined",
+    "title": "yes please",
+    "ticketId": "ESC-90-3A6E",
+    "jiraKey": "KAN-2885",
+    "issueSummary": "yes please",
+    "sharingLink": "https://localhost:443/sharing?c=Bu3@V8kY0sV8yQX3AhFM2ZmhyVIOuOPyhVYAdoqOHp6lP$$l6hczA7excRopeqgjAucTDMW5p9uFt9RN70BqITgyC5bqtGM7IDRZEGcBYUnWxLZFoVjeESLEH18=",
+    "chatLink": "http://localhost:8001/support/chat/90",
+    "engineerJoined": true,
+    "engineerJoinedAt": "2026-09-28T07:16:34.305815Z",
+    "engineerName": "Alex Turner (Support Engineer)",
+    "createdAt": null
+  },
+  {
+    "id": "99999",
+    "messages": [],
+    "status": "active",
+    "title": "Zoom freezing remediation - Maya Patel",
+    "ticketId": "ESC-99999-7912",
+    "jiraKey": "KAN-1701445",
+    "issueSummary": "Zoom freezing remediation - Maya Patel",
+    "sharingLink": null,
+    "chatLink": "http://localhost:8001/support/chat/99999",
+    "engineerJoined": false,
+    "engineerJoinedAt": null,
+    "engineerName": null,
+    "createdAt": null
+  },
+  {
+    "id": "95",
+    "messages": [
+      {
+        "id": "handoff-95-1790587269",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-2686.",
+        "jiraKey": "KAN-2686",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-2686",
+        "sharingLink": "https://localhost:443/sharing?c=R28iBhJnkMujkixFLRSCatjthOgeymmktX4tQ@OtLPa2nd1JcB8iIsv8YT8mJFZO@FMxzsAzFK1Is7fZ8SGdpnWhYKcGigr$Dj2P5pXkHmk0VM$npIpDlZj8I0o=",
+        "timestamp": "2026-09-28T09:21:09.699501Z"
+      },
+      {
+        "id": "join-95-1790587320351",
+        "role": "system",
+        "kind": "engineer_joined",
+        "type": "engineer_joined",
+        "engineerName": "Alex Turner (Support Engineer)",
+        "content": "Alex Turner (Support Engineer) has connected to this support chat session.",
+        "timestamp": "2026-09-28T09:22:00.351111Z"
+      },
+      {
+        "id": "engineer-1790587360574-1992",
+        "role": "engineer",
+        "content": "hello",
+        "timestamp": "2026-09-28T09:22:40.574710Z"
+      }
+    ],
+    "status": "engineer_joined",
+    "title": "please escalate",
+    "ticketId": "ESC-95-A933",
+    "jiraKey": "KAN-2686",
+    "issueSummary": "please escalate",
+    "sharingLink": "https://localhost:443/sharing?c=R28iBhJnkMujkixFLRSCatjthOgeymmktX4tQ@OtLPa2nd1JcB8iIsv8YT8mJFZO@FMxzsAzFK1Is7fZ8SGdpnWhYKcGigr$Dj2P5pXkHmk0VM$npIpDlZj8I0o=",
+    "chatLink": "http://localhost:8001/support/chat/95",
+    "engineerJoined": true,
+    "engineerJoinedAt": "2026-09-28T10:36:39.330559Z",
+    "engineerName": "Alex Turner (Support Engineer)",
+    "createdAt": null
+  },
+  {
+    "id": "102",
+    "messages": [],
+    "status": "active",
+    "title": "Zoom freezing remediation - Maya Sharma",
+    "ticketId": "ESC-102-5BDD",
+    "jiraKey": "KAN-2928",
+    "issueSummary": "Zoom freezing remediation - Maya Sharma",
+    "sharingLink": null,
+    "chatLink": "http://localhost:8001/support/chat/102",
+    "engineerJoined": false,
+    "engineerJoinedAt": null,
+    "engineerName": null,
+    "createdAt": null
+  },
+  {
+    "id": "103",
+    "messages": [
+      {
+        "id": "handoff-103-1790594143",
+        "role": "system",
+        "kind": "handoff",
+        "type": "handoff",
+        "content": "Live Handoff Initiated: Issue escalated to L2 Support Engineer (Alex Turner). Jira: KAN-3296.",
+        "jiraKey": "KAN-3296",
+        "jiraUrl": "https://agnishpaul2002.atlassian.net/browse/KAN-3296",
+        "sharingLink": "https://localhost:443/sharing?c=V09UDtBzTBOlAo$QdFEhNvLnvXrlvyiWZuMzrTid45EdoEpGJ20sU4tB9bMhTEBZ9Eh9K6N3wuf$YWL1WjdtUjXKBNk2XZeeqpDzXtWBvG2OK5zariQH@plRNPs=",
+        "timestamp": "2026-09-28T11:15:43.914514Z"
+      },
+      {
+        "id": "join-103-1790594213698",
+        "role": "system",
+        "kind": "engineer_joined",
+        "type": "engineer_joined",
+        "engineerName": "Alex Turner (Support Engineer)",
+        "content": "Alex Turner (Support Engineer) has connected to this support chat session.",
+        "timestamp": "2026-09-28T11:16:53.698302Z"
+      }
+    ],
+    "status": "engineer_joined",
+    "title": "yes pls",
+    "ticketId": "ESC-103-18DE",
+    "jiraKey": "KAN-3296",
+    "issueSummary": "yes pls",
+    "sharingLink": "https://localhost:443/sharing?c=V09UDtBzTBOlAo$QdFEhNvLnvXrlvyiWZuMzrTid45EdoEpGJ20sU4tB9bMhTEBZ9Eh9K6N3wuf$YWL1WjdtUjXKBNk2XZeeqpDzXtWBvG2OK5zariQH@plRNPs=",
+    "chatLink": "http://localhost:8001/support/chat/103",
+    "engineerJoined": true,
+    "engineerJoinedAt": "2026-09-28T11:22:36.370474Z",
+    "engineerName": "Alex Turner (Support Engineer)",
+    "createdAt": null
+  }
+]
