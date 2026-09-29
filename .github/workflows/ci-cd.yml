@@ -17,8 +17,8 @@ env:
   AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
   AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
   ECR_REGISTRY: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION || 'us-east-1' }}.amazonaws.com
-  ECR_FRONTEND_REPOSITORY: ${{ vars.ECR_FRONTEND_REPOSITORY || 'meridian-helpdesk-frontend' }}
-  ECR_BACKEND_REPOSITORY: ${{ vars.ECR_BACKEND_REPOSITORY || 'meridian-helpdesk-backend' }}
+  ECR_FRONTEND_REPOSITORY: ${{ vars.ECR_FRONTEND_REPOSITORY || 'github-cicd-demo-frontend' }}
+  ECR_BACKEND_REPOSITORY: ${{ vars.ECR_BACKEND_REPOSITORY || 'github-cicd-demo-backend' }}
 
 jobs:
   syntax:
