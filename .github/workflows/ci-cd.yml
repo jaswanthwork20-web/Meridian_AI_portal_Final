@@ -172,6 +172,8 @@ jobs:
           vuln-type: os,library
           ignore-unfixed: true
           exit-code: "1"
+          format: json
+          output: backend-trivy.json
       - name: Scan frontend image
         uses: aquasecurity/trivy-action@master
         with:
@@ -180,6 +182,46 @@ jobs:
           vuln-type: os,library
           ignore-unfixed: true
           exit-code: "1"
+          format: json
+          output: frontend-trivy.json
+      - name: Summarize findings
+        if: always()
+        shell: bash
+        run: |
+            python - <<'PY'
+            import json
+            from pathlib import Path
+
+            for report in ("backend-trivy.json", "frontend-trivy.json"):
+              report_path = Path(report)
+              print(f"### {report}")
+              if not report_path.is_file() or report_path.stat().st_size == 0:
+                print("No report generated (scan may have failed before reporting).")
+                continue
+              with report_path.open(encoding="utf-8") as report_file:
+                results = json.load(report_file).get("Results") or []
+              findings = [
+                vulnerability
+                for result in results
+                for vulnerability in result.get("Vulnerabilities") or []
+              ]
+              if not findings:
+                print("No vulnerabilities reported.")
+              for finding in findings:
+                fixed = finding.get("FixedVersion") or "no fix listed"
+                print(
+                  f"{finding.get('Severity')} {finding.get('VulnerabilityID')} | "
+                  f"{finding.get('PkgName')} {finding.get('InstalledVersion')} -> {fixed}"
+                )
+            PY
+      - name: Upload Trivy reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-reports
+          path: '*-trivy.json'
+          retention-days: 30
+          if-no-files-found: warn
 
   sbom:
     name: Generate SBOM
