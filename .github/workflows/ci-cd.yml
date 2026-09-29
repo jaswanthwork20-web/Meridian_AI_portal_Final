@@ -165,7 +165,7 @@ jobs:
           docker load -i /tmp/container-images/backend-image.tar
           docker load -i /tmp/container-images/frontend-image.tar
       - name: Scan backend image
-        uses: aquasecurity/trivy-action@v0.28.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: meridian/backend:${{ github.sha }}
           severity: CRITICAL,HIGH
@@ -173,7 +173,7 @@ jobs:
           ignore-unfixed: true
           exit-code: "1"
       - name: Scan frontend image
-        uses: aquasecurity/trivy-action@v0.28.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: meridian/frontend:${{ github.sha }}
           severity: CRITICAL,HIGH
