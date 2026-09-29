@@ -330,7 +330,8 @@ jobs:
             "$APP_DIR" "$AWS_REGION" "$SECRET_NAME" "$ECR_REGISTRY" \
             "$ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest" \
             "$ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest")
-          remote_command="${remote_env}$(cat <<'REMOTE'
+          remote_command="bash -s <<'MERIDIAN_REMOTE_BASH'
+          ${remote_env}$(cat <<'REMOTE'
           set -euo pipefail
           stage='starting deployment'
           trap 'status=$?; echo "DEPLOYMENT FAILED during: $stage (exit $status)" >&2; exit "$status"' ERR
@@ -392,7 +393,8 @@ jobs:
           docker compose ps
           echo 'DEPLOYMENT COMPLETED SUCCESSFULLY'
           REMOTE
-          )"
+          )
+          MERIDIAN_REMOTE_BASH"
           jq -n --arg command "$remote_command" '{commands: [$command]}' > ssm-commands.json
           echo 'Sending deployment command to EC2...'
           command_id=$(aws ssm send-command \
@@ -449,7 +451,8 @@ jobs:
           set -euo pipefail
           : "${EC2_INSTANCE_ID:?Set the EC2_INSTANCE_ID repository variable}"
           remote_env=$(printf 'export APP_DIR=%q\n' "$APP_DIR")
-          remote_command="${remote_env}$(cat <<'REMOTE'
+          remote_command="bash -s <<'MERIDIAN_REMOTE_BASH'
+          ${remote_env}$(cat <<'REMOTE'
           set -euo pipefail
           stage='entering application directory'
           trap 'status=$?; echo "VERIFICATION FAILED during: $stage (exit $status)" >&2; exit "$status"' ERR
@@ -470,7 +473,8 @@ jobs:
           curl --fail --silent --show-error http://127.0.0.1/health >/dev/null
           echo 'Backend, frontend, and reverse-proxy health checks passed.'
           REMOTE
-          )"
+          )
+          MERIDIAN_REMOTE_BASH"
           jq -n --arg command "$remote_command" '{commands: [$command]}' > verify.json
           command_id=$(aws ssm send-command --region "$AWS_REGION" --instance-ids "$EC2_INSTANCE_ID" --document-name AWS-RunShellScript --comment 'Verify Meridian deployment' --parameters file://verify.json --query 'Command.CommandId' --output text)
           echo "SSM verification command ID: $command_id"
@@ -521,7 +525,8 @@ jobs:
           : "${EC2_INSTANCE_ID:?Set the EC2_INSTANCE_ID repository variable}"
           remote_env=$(printf 'export APP_DIR=%q AWS_REGION=%q ECR_REGISTRY=%q BACKEND_REPOSITORY=%q FRONTEND_REPOSITORY=%q\n' \
             "$APP_DIR" "$AWS_REGION" "$ECR_REGISTRY" "$ECR_BACKEND_REPOSITORY" "$ECR_FRONTEND_REPOSITORY")
-          remote_command="${remote_env}$(cat <<'REMOTE'
+          remote_command="bash -s <<'MERIDIAN_REMOTE_BASH'
+          ${remote_env}$(cat <<'REMOTE'
           set -euo pipefail
           stage='entering application directory'
           trap 'status=$?; echo "ROLLBACK FAILED during: $stage (exit $status)" >&2; exit "$status"' ERR
@@ -562,7 +567,8 @@ jobs:
           docker compose exec -T frontend wget --spider --quiet http://127.0.0.1/health
           echo 'ROLLBACK COMPLETED SUCCESSFULLY'
           REMOTE
-          )"
+          )
+          MERIDIAN_REMOTE_BASH"
           jq -n --arg command "$remote_command" '{commands: [$command]}' > rollback.json
           command_id=$(aws ssm send-command --region "$AWS_REGION" --instance-ids "$EC2_INSTANCE_ID" --document-name AWS-RunShellScript --comment 'Rollback Meridian deployment' --parameters file://rollback.json --query 'Command.CommandId' --output text)
           echo "SSM rollback command ID: $command_id"
