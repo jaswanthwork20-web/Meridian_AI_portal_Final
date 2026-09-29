@@ -181,7 +181,6 @@ jobs:
           severity: CRITICAL,HIGH
           vuln-type: os,library
           ignore-unfixed: true
-          exit-code: "1"
           format: json
           output: frontend-trivy.json
           exit-code: "0"
