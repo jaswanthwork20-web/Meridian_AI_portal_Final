@@ -297,8 +297,8 @@ jobs:
     env:
       APP_DIR: ${{ vars.EC2_APP_DIR || '/opt/meridian' }}
       EC2_INSTANCE_ID: ${{ vars.EC2_INSTANCE_ID }}
-      BACKEND_IMAGE: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION || 'us-east-1' }}.amazonaws.com/${{ vars.ECR_BACKEND_REPOSITORY || 'meridian-helpdesk-backend' }}:${{ github.sha }}
-      FRONTEND_IMAGE: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION || 'us-east-1' }}.amazonaws.com/${{ vars.ECR_FRONTEND_REPOSITORY || 'meridian-helpdesk-frontend' }}:${{ github.sha }}
+      BACKEND_IMAGE: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION || 'us-east-1' }}.amazonaws.com/${{ vars.ECR_BACKEND_REPOSITORY || 'github-cicd-demo-backend' }}:${{ github.sha }}
+      FRONTEND_IMAGE: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION || 'us-east-1' }}.amazonaws.com/${{ vars.ECR_FRONTEND_REPOSITORY || 'github-cicd-demo-frontend' }}:${{ github.sha }}
       APP_SECRET_NAME: ${{ vars.APP_SECRET_NAME || 'Meridian-Secret-For-EC2' }}
     steps:
       - uses: actions/checkout@v4
