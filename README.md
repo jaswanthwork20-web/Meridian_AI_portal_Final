@@ -51,7 +51,7 @@ For production, set `ENVIRONMENT=production` and provide `JWT_SECRET` with at le
 
 ## CI/CD Setup
 
-`.github/workflows/ci-cd.yml` runs Python syntax, Ruff, Vulture, MyPy, tests, Bandit, Gitleaks, pip-audit, Docker builds, Trivy scans, and CycloneDX SBOM generation. The image scan gates publishing. Main-branch pushes then publish immutable commit-SHA tags and `latest` tags to ECR, deploy the immutable tags through SSM, verify the services, and attempt rollback to the previous image tags if deployment or verification fails. The `production` GitHub Environment can require reviewers before deployment.
+`.github/workflows/ci-cd.yml` runs Python syntax, Ruff, Vulture, MyPy, tests, Bandit, Gitleaks, pip-audit, Docker builds, Trivy scans, and CycloneDX SBOM generation. Main-branch pushes build and publish `latest` images to ECR, deploy them through SSM, verify the services, and attempt a digest-based rollback if deployment or verification fails. The SSM deploy, verification, and rollback commands are defined directly in the workflow. The `docker-build-approval` GitHub Environment can require reviewers before images are built.
 
 Configure these GitHub repository variables:
 
@@ -59,9 +59,9 @@ Configure these GitHub repository variables:
 - `AWS_REGION`: AWS region (defaults to `us-east-1`).
 - `AWS_ROLE_ARN`: OIDC role assumed by GitHub Actions.
 - `EC2_INSTANCE_ID`: SSM-managed deployment instance.
-- `EC2_APP_DIR`: application checkout directory on EC2 (defaults to `/opt/meridian`).
+- `EC2_APP_DIR`: application checkout directory on EC2 (defaults to `/home/ssm-user/Meridian-Tech-Integrated`).
 - `APP_SECRET_NAME`: Secrets Manager secret name (defaults to `Meridian-Secret-For-EC2`).
-- `ECR_BACKEND_REPOSITORY` and `ECR_FRONTEND_REPOSITORY`: repository names (defaults to `meridian-helpdesk-backend` and `meridian-helpdesk-frontend`).
+- `ECR_BACKEND_REPOSITORY` and `ECR_FRONTEND_REPOSITORY`: repository names (defaults to `github-cicd-demo-backend` and `github-cicd-demo-frontend`).
 
 The GitHub OIDC role needs ECR authentication and push permissions plus `ssm:SendCommand` and `ssm:GetCommandInvocation` for the deployment instance. The EC2 instance must be registered with Systems Manager, have Docker Compose installed, be able to pull from ECR, and have permission to read the application secret from Secrets Manager. The application checkout at `EC2_APP_DIR` must contain this repository's `docker-compose.yml`. The secret should be a JSON object containing `JWT_SECRET` and the configured integration settings (for example `JIRA_API_TOKEN`, `CONFLUENCE_API_KEY`, and MeshCentral credentials).
 

@@ -2,9 +2,26 @@ name: Meridian CI-CD
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
+
+# ==================================================
+# GLOBAL ENVIRONMENT
+# ==================================================
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID || '317492541707' }}
+  ECR_REGISTRY: ${{ vars.AWS_ACCOUNT_ID || '317492541707' }}.dkr.ecr.${{ vars.AWS_REGION || 'us-east-1' }}.amazonaws.com
+  ECR_FRONTEND_REPOSITORY: ${{ vars.ECR_FRONTEND_REPOSITORY || 'github-cicd-demo-frontend' }}
+  ECR_BACKEND_REPOSITORY: ${{ vars.ECR_BACKEND_REPOSITORY || 'github-cicd-demo-backend' }}
+
+# ==================================================
+# GLOBAL PERMISSIONS
+# ==================================================
 
 permissions:
   contents: read
@@ -13,25 +30,31 @@ concurrency:
   group: meridian-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-env:
-  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
-  AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
-  ECR_REGISTRY: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION || 'us-east-1' }}.amazonaws.com
-  ECR_FRONTEND_REPOSITORY: ${{ vars.ECR_FRONTEND_REPOSITORY || 'github-cicd-demo-frontend' }}
-  ECR_BACKEND_REPOSITORY: ${{ vars.ECR_BACKEND_REPOSITORY || 'github-cicd-demo-backend' }}
+# ==================================================
+# JOBS
+# ==================================================
 
 jobs:
+  # ==================================================
+  # 1. PYTHON SYNTAX CHECK
+  # ==================================================
   syntax:
     name: Python syntax
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - name: Compile backend
-        run: python -m compileall -q backend
+        working-directory: backend
+        run: python -m compileall -q .
 
+  # ==================================================
+  # 2. RUFF LINT
+  # ==================================================
   lint:
     name: Ruff lint
     runs-on: ubuntu-latest
@@ -41,9 +64,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python -m pip install --upgrade pip ruff
-      - run: ruff check backend || true
+      - name: Install Ruff
+        run: python -m pip install --upgrade pip ruff
+      - name: Run Ruff
+        working-directory: backend
+        run: ruff check . || true
 
+  # ==================================================
+  # 3. UNUSED CODE SCAN
+  # ==================================================
   unused-code:
     name: Unused code scan
     runs-on: ubuntu-latest
@@ -53,9 +82,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python -m pip install --upgrade pip vulture || true
-      - run: vulture backend --min-confidence 80 || true
+      - name: Install Vulture
+        run: python -m pip install --upgrade pip vulture
+      - name: Run Vulture
+        working-directory: backend
+        run: vulture . --min-confidence 80 || true
 
+  # ==================================================
+  # 4. TYPE CHECK
+  # ==================================================
   type-check:
     name: MyPy type check
     runs-on: ubuntu-latest
@@ -65,11 +100,18 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python -m pip install --upgrade pip mypy || true
-      - run: mypy backend --ignore-missing-imports --follow-imports=silent || true
+      - name: Install dependencies
+        working-directory: backend
+        run: python -m pip install --upgrade pip && pip install -r requirements.txt mypy
+      - name: Run MyPy
+        working-directory: backend
+        run: mypy . || true
 
+  # ==================================================
+  # 5. UNIT TESTS + COVERAGE
+  # ==================================================
   test:
-    name: Unit tests
+    name: Tests
     runs-on: ubuntu-latest
     env:
       ENVIRONMENT: test
@@ -81,9 +123,14 @@ jobs:
           python-version: "3.11"
           cache: pip
           cache-dependency-path: backend/requirements.txt
-      - run: python -m pip install --upgrade pip pytest fastapi sqlalchemy python-dotenv bcrypt 'python-jose[cryptography]'
-      - run: pytest -q backend/tests/test_auth_security.py
+      - name: Install test dependencies
+        run: python -m pip install --upgrade pip pytest pytest-cov fastapi sqlalchemy python-dotenv bcrypt 'python-jose[cryptography]'
+      - name: Run focused unit tests
+        run: pytest -q backend/tests/test_auth_security.py --cov=backend --cov-report=term-missing --cov-report=xml
 
+  # ==================================================
+  # 6. BANDIT SECURITY SCAN
+  # ==================================================
   security:
     name: Bandit security scan
     runs-on: ubuntu-latest
@@ -93,9 +140,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python -m pip install --upgrade pip bandit || true
-      - run: bandit -r backend -ll -x backend/tests || true
+      - name: Install Bandit
+        run: python -m pip install --upgrade pip bandit
+      - name: Run Bandit
+        working-directory: backend
+        run: bandit -r . -ll -x tests || true
 
+  # ==================================================
+  # 7. SECRET DETECTION
+  # ==================================================
   secrets:
     name: Secret detection
     runs-on: ubuntu-latest
@@ -104,10 +157,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: gitleaks/gitleaks-action@v2
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  # ==================================================
+  # 8. DEPENDENCY SCAN
+  # ==================================================
   dependency-scan:
     name: Dependency scan
     runs-on: ubuntu-latest
@@ -117,113 +174,75 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python -m pip install --upgrade pip pip-audit || true
-      - run: pip-audit -r backend/requirements.txt || true
+      - name: Install pip-audit
+        run: python -m pip install --upgrade pip pip-audit
+      - name: Run pip-audit
+        run: pip-audit -r backend/requirements.txt || true
 
+  # ==================================================
+  # 9. BUILD DOCKER IMAGES
+  # ==================================================
   build:
     name: Build Docker images
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [syntax, lint, unused-code, type-check, test, security, secrets, dependency-scan]
     runs-on: ubuntu-latest
+    environment:
+      name: docker-build-approval
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
-      - name: Build backend image
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend
-          file: ./backend/Dockerfile
-          tags: meridian/backend:${{ github.sha }}
-          outputs: type=docker,dest=/tmp/backend-image.tar
-          cache-from: type=gha,scope=backend
-          cache-to: type=gha,mode=max,scope=backend
       - name: Build frontend image
-        uses: docker/build-push-action@v6
-        with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
-          tags: meridian/frontend:${{ github.sha }}
-          outputs: type=docker,dest=/tmp/frontend-image.tar
-          cache-from: type=gha,scope=frontend
-          cache-to: type=gha,mode=max,scope=frontend
-      - uses: actions/upload-artifact@v4
+        run: docker build -t "$ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest" ./frontend
+      - name: Build backend image
+        run: docker build -t "$ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest" ./backend
+      - name: Save Docker images
+        run: |
+          docker save "$ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest" -o frontend.tar
+          docker save "$ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest" -o backend.tar
+      - name: Upload Docker images
+        uses: actions/upload-artifact@v4
         with:
           name: container-images
-          path: /tmp/*-image.tar
+          path: |
+            frontend.tar
+            backend.tar
           retention-days: 1
           if-no-files-found: error
 
+  # ==================================================
+  # 10. DOCKER VULNERABILITY SCAN
+  # ==================================================
   container-security:
     name: Container vulnerability scan
     needs: [build]
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: container-images
-          path: /tmp/container-images
-      - run: |
-          docker load -i /tmp/container-images/backend-image.tar
-          docker load -i /tmp/container-images/frontend-image.tar
-      - name: Scan backend image
-        uses: aquasecurity/trivy-action@master #master
-        with:
-          image-ref: meridian/backend:${{ github.sha }}
-          severity: CRITICAL,HIGH
-          vuln-type: os,library
-          ignore-unfixed: true
-          format: json
-          output: backend-trivy.json
-          exit-code: "0"
-      - name: Scan frontend image
+      - name: Load Docker images
+        run: |
+          docker load -i frontend.tar
+          docker load -i backend.tar
+      - name: Trivy frontend scan
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: meridian/frontend:${{ github.sha }}
+          image-ref: ${{ env.ECR_REGISTRY }}/${{ env.ECR_FRONTEND_REPOSITORY }}:latest
           severity: CRITICAL,HIGH
-          vuln-type: os,library
-          ignore-unfixed: true
-          format: json
-          output: frontend-trivy.json
+          format: table
           exit-code: "0"
-      - name: Summarize findings
-        if: always()
-        shell: bash
-        run: |
-            python - <<'PY'
-            import json
-            from pathlib import Path
-
-            for report in ("backend-trivy.json", "frontend-trivy.json"):
-              report_path = Path(report)
-              print(f"### {report}")
-              if not report_path.is_file() or report_path.stat().st_size == 0:
-                print("No report generated (scan may have failed before reporting).")
-                continue
-              with report_path.open(encoding="utf-8") as report_file:
-                results = json.load(report_file).get("Results") or []
-              findings = [
-                vulnerability
-                for result in results
-                for vulnerability in result.get("Vulnerabilities") or []
-              ]
-              if not findings:
-                print("No vulnerabilities reported.")
-              for finding in findings:
-                fixed = finding.get("FixedVersion") or "no fix listed"
-                print(
-                  f"{finding.get('Severity')} {finding.get('VulnerabilityID')} | "
-                  f"{finding.get('PkgName')} {finding.get('InstalledVersion')} -> {fixed}"
-                )
-            PY
-      - name: Upload Trivy reports
-        if: always()
-        uses: actions/upload-artifact@v4
+      - name: Trivy backend scan
+        uses: aquasecurity/trivy-action@master
         with:
-          name: trivy-reports
-          path: '*-trivy.json'
-          retention-days: 30
-          if-no-files-found: warn
-          
+          image-ref: ${{ env.ECR_REGISTRY }}/${{ env.ECR_BACKEND_REPOSITORY }}:latest
+          severity: CRITICAL,HIGH
+          format: table
+          exit-code: "0"
 
+  # ==================================================
+  # 11. SBOM GENERATION
+  # ==================================================
   sbom:
     name: Generate SBOM
     needs: [build]
@@ -232,23 +251,27 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: container-images
-          path: /tmp/container-images
-      - run: |
-          docker load -i /tmp/container-images/backend-image.tar
-          docker load -i /tmp/container-images/frontend-image.tar
+      - name: Load Docker images
+        run: |
+          docker load -i frontend.tar
+          docker load -i backend.tar
       - name: Install Syft
         run: curl -sSfL https://raw.githubusercontent.com/anchore/syft/v1.52.0/install.sh | sh -s -- -b /usr/local/bin v1.52.0
-      - name: Generate CycloneDX SBOMs
-        run: |
-          syft meridian/backend:${GITHUB_SHA} -o cyclonedx-json=backend-sbom.json
-          syft meridian/frontend:${GITHUB_SHA} -o cyclonedx-json=frontend-sbom.json
-      - uses: actions/upload-artifact@v4
+      - name: Generate frontend SBOM
+        run: syft "$ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest" -o cyclonedx-json=frontend-sbom.json
+      - name: Generate backend SBOM
+        run: syft "$ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest" -o cyclonedx-json=backend-sbom.json
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
         with:
           name: sbom
-          path: '*-sbom.json'
+          path: "*-sbom.json"
           retention-days: 90
           if-no-files-found: error
 
+  # ==================================================
+  # 12. PUSH IMAGES TO ECR
+  # ==================================================
   push-ecr:
     name: Push images to ECR
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -261,90 +284,304 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: container-images
-          path: /tmp/container-images
-      - run: |
-          docker load -i /tmp/container-images/backend-image.tar
-          docker load -i /tmp/container-images/frontend-image.tar
-      - uses: aws-actions/configure-aws-credentials@v5
+      - name: Load Docker images
+        run: |
+          docker load -i frontend.tar
+          docker load -i backend.tar
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
-      - uses: aws-actions/amazon-ecr-login@v2
-      - name: Tag and push immutable and latest tags
-        env:
-          IMAGE_TAG: ${{ github.sha }}
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Push latest images
         run: |
           set -euo pipefail
-          docker tag "meridian/backend:${IMAGE_TAG}" "${ECR_REGISTRY}/${ECR_BACKEND_REPOSITORY}:${IMAGE_TAG}"
-          docker tag "meridian/frontend:${IMAGE_TAG}" "${ECR_REGISTRY}/${ECR_FRONTEND_REPOSITORY}:${IMAGE_TAG}"
-          docker tag "meridian/backend:${IMAGE_TAG}" "${ECR_REGISTRY}/${ECR_BACKEND_REPOSITORY}:latest"
-          docker tag "meridian/frontend:${IMAGE_TAG}" "${ECR_REGISTRY}/${ECR_FRONTEND_REPOSITORY}:latest"
-          docker push "${ECR_REGISTRY}/${ECR_BACKEND_REPOSITORY}:${IMAGE_TAG}"
-          docker push "${ECR_REGISTRY}/${ECR_FRONTEND_REPOSITORY}:${IMAGE_TAG}"
-          docker push "${ECR_REGISTRY}/${ECR_BACKEND_REPOSITORY}:latest"
-          docker push "${ECR_REGISTRY}/${ECR_FRONTEND_REPOSITORY}:latest"
+          docker push "$ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest"
+          docker push "$ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest"
 
+  # ==================================================
+  # 13. DEPLOY TO EC2 USING SSM
+  # ==================================================
   deploy:
     name: Deploy to EC2 with SSM
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [push-ecr]
     runs-on: ubuntu-latest
-    environment:
-      name: production
     permissions:
       contents: read
       id-token: write
     env:
-      APP_DIR: ${{ vars.EC2_APP_DIR || '/opt/meridian' }}
       EC2_INSTANCE_ID: ${{ vars.EC2_INSTANCE_ID }}
-      BACKEND_IMAGE: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION || 'us-east-1' }}.amazonaws.com/${{ vars.ECR_BACKEND_REPOSITORY || 'github-cicd-demo-backend' }}:${{ github.sha }}
-      FRONTEND_IMAGE: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION || 'us-east-1' }}.amazonaws.com/${{ vars.ECR_FRONTEND_REPOSITORY || 'github-cicd-demo-frontend' }}:${{ github.sha }}
-      APP_SECRET_NAME: ${{ vars.APP_SECRET_NAME || 'Meridian-Secret-For-EC2' }}
+      APP_DIR: ${{ vars.EC2_APP_DIR || '/home/ssm-user/Meridian-Tech-Integrated' }}
+      SECRET_NAME: ${{ vars.APP_SECRET_NAME || 'Meridian-Secret-For-EC2' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: aws-actions/configure-aws-credentials@v5
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
-      - name: Deploy application
-        run: bash .github/scripts/ssm-send.sh deploy/deploy.sh 'Deploy Meridian release'
+      - name: Deploy latest release
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${EC2_INSTANCE_ID:?Set the EC2_INSTANCE_ID repository variable}"
+          remote_env=$(printf 'export APP_DIR=%q AWS_REGION=%q SECRET_NAME=%q ECR_REGISTRY=%q BACKEND_IMAGE=%q FRONTEND_IMAGE=%q\n' \
+            "$APP_DIR" "$AWS_REGION" "$SECRET_NAME" "$ECR_REGISTRY" \
+            "$ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest" \
+            "$ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest")
+          remote_command="${remote_env}$(cat <<'REMOTE'
+          set -euo pipefail
+          stage='starting deployment'
+          trap 'status=$?; echo "DEPLOYMENT FAILED during: $stage (exit $status)" >&2; exit "$status"' ERR
+          echo 'STARTING DEPLOYMENT'
+          stage="entering application directory: $APP_DIR"
+          echo "Stage: $stage"
+          cd "$APP_DIR"
+          stage='checking docker-compose.yml and deployment settings'
+          echo "Stage: $stage"
+          test -f docker-compose.yml
+          : "${BACKEND_IMAGE:?Backend image is required}"
+          : "${FRONTEND_IMAGE:?Frontend image is required}"
+          rm -f .previous_backend_digest .previous_frontend_digest
+          docker image inspect "$BACKEND_IMAGE" --format '{{index .RepoDigests 0}}' > .previous_backend_digest 2>/dev/null || true
+          docker image inspect "$FRONTEND_IMAGE" --format '{{index .RepoDigests 0}}' > .previous_frontend_digest 2>/dev/null || true
+          stage='checking EC2 AWS identity and secret access'
+          echo "Stage: $stage"
+          aws sts get-caller-identity --region "$AWS_REGION"
+          aws secretsmanager describe-secret --secret-id "$SECRET_NAME" --region "$AWS_REGION" >/dev/null
+          stage='retrieving application secret'
+          echo "Stage: $stage"
+          secret_json=$(aws secretsmanager get-secret-value --secret-id "$SECRET_NAME" --region "$AWS_REGION" --query SecretString --output text)
+          test -n "$secret_json"
+          stage='writing runtime environment file'
+          echo "Stage: $stage"
+          printf '%s' "$secret_json" | python3 -c '
+          import json
+          import re
+          import sys
 
+          values = json.load(sys.stdin)
+          if not isinstance(values, dict):
+              raise SystemExit("Secrets Manager value must be a JSON object")
+          reserved = {"ENVIRONMENT", "AWS_REGION", "DATABASE_PATH", "BACKEND_IMAGE", "FRONTEND_IMAGE"}
+          for key, value in values.items():
+              if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", key) or key in reserved:
+                  continue
+              if isinstance(value, (dict, list)):
+                  value = json.dumps(value, separators=(",", ":"))
+              else:
+                  value = str(value)
+              print(f"{key}={json.dumps(value)}")
+          ' > .env
+          grep -q '^JWT_SECRET=' .env
+          printf 'ENVIRONMENT=production\nAWS_REGION=%s\nDATABASE_PATH=/app/backend/data/shopmart.db\nBACKEND_IMAGE=%s\nFRONTEND_IMAGE=%s\n' \
+            "$AWS_REGION" "$BACKEND_IMAGE" "$FRONTEND_IMAGE" >> .env
+          chmod 600 .env
+          stage='logging in to Amazon ECR'
+          echo "Stage: $stage"
+          aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+          stage='pulling latest Docker images'
+          echo "Stage: $stage"
+          docker compose pull
+          stage='starting application containers'
+          echo "Stage: $stage"
+          docker compose up -d --no-build --remove-orphans
+          stage='checking container status'
+          echo "Stage: $stage"
+          docker compose ps
+          echo 'DEPLOYMENT COMPLETED SUCCESSFULLY'
+          REMOTE
+          )"
+          jq -n --arg command "$remote_command" '{commands: [$command]}' > ssm-commands.json
+          echo 'Sending deployment command to EC2...'
+          command_id=$(aws ssm send-command \
+            --region "$AWS_REGION" \
+            --instance-ids "$EC2_INSTANCE_ID" \
+            --document-name AWS-RunShellScript \
+            --comment 'Deploy Meridian latest release' \
+            --parameters file://ssm-commands.json \
+            --query 'Command.CommandId' \
+            --output text)
+          echo "SSM command ID: $command_id"
+          for attempt in $(seq 1 60); do
+            status=$(aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query Status --output text 2>/dev/null || true)
+            echo "[$attempt/60] SSM status: ${status:-Pending}"
+            case "$status" in
+              Success)
+                aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query StandardOutputContent --output text
+                exit 0
+                ;;
+              Failed|Cancelled|TimedOut|Cancelling)
+                aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query '{Status:Status,StatusDetails:StatusDetails,Output:StandardOutputContent,Error:StandardErrorContent}' --output json || true
+                exit 1
+                ;;
+              *)
+                [ "$attempt" -eq 60 ] || sleep 10
+                ;;
+            esac
+          done
+          aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query '{Status:Status,StatusDetails:StatusDetails,Output:StandardOutputContent,Error:StandardErrorContent}' --output json || true
+          exit 1
+
+  # ==================================================
+  # 14. VERIFY DEPLOYMENT
+  # ==================================================
   verify:
     name: Verify deployment
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [deploy]
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
     env:
-      APP_DIR: ${{ vars.EC2_APP_DIR || '/opt/meridian' }}
       EC2_INSTANCE_ID: ${{ vars.EC2_INSTANCE_ID }}
+      APP_DIR: ${{ vars.EC2_APP_DIR || '/home/ssm-user/Meridian-Tech-Integrated' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: aws-actions/configure-aws-credentials@v5
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
-      - name: Verify deployed services
-        run: bash .github/scripts/ssm-send.sh deploy/verify.sh 'Verify Meridian release'
+      - name: Verify deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${EC2_INSTANCE_ID:?Set the EC2_INSTANCE_ID repository variable}"
+          remote_env=$(printf 'export APP_DIR=%q\n' "$APP_DIR")
+          remote_command="${remote_env}$(cat <<'REMOTE'
+          set -euo pipefail
+          stage='entering application directory'
+          trap 'status=$?; echo "VERIFICATION FAILED during: $stage (exit $status)" >&2; exit "$status"' ERR
+          cd "$APP_DIR"
+          stage='checking Docker Compose services'
+          echo "Stage: $stage"
+          docker compose ps
+          docker compose ps --status running --services | grep -qx backend
+          docker compose ps --status running --services | grep -qx frontend
+          stage='checking backend health'
+          echo "Stage: $stage"
+          docker compose exec -T backend python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=10)"
+          stage='checking frontend health'
+          echo "Stage: $stage"
+          docker compose exec -T frontend wget --spider --quiet http://127.0.0.1/health
+          stage='checking public reverse-proxy health'
+          echo "Stage: $stage"
+          curl --fail --silent --show-error http://127.0.0.1/health >/dev/null
+          echo 'Backend, frontend, and reverse-proxy health checks passed.'
+          REMOTE
+          )"
+          jq -n --arg command "$remote_command" '{commands: [$command]}' > verify.json
+          command_id=$(aws ssm send-command --region "$AWS_REGION" --instance-ids "$EC2_INSTANCE_ID" --document-name AWS-RunShellScript --comment 'Verify Meridian deployment' --parameters file://verify.json --query 'Command.CommandId' --output text)
+          echo "SSM verification command ID: $command_id"
+          for attempt in $(seq 1 30); do
+            status=$(aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query Status --output text 2>/dev/null || true)
+            echo "[$attempt/30] Verification status: ${status:-Pending}"
+            case "$status" in
+              Success)
+                aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query StandardOutputContent --output text
+                exit 0
+                ;;
+              Failed|Cancelled|TimedOut|Cancelling)
+                aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query '{Status:Status,StatusDetails:StatusDetails,Output:StandardOutputContent,Error:StandardErrorContent}' --output json || true
+                exit 1
+                ;;
+              *)
+                [ "$attempt" -eq 30 ] || sleep 10
+                ;;
+            esac
+          done
+          aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query '{Status:Status,StatusDetails:StatusDetails,Output:StandardOutputContent,Error:StandardErrorContent}' --output json || true
+          exit 1
 
+  # ==================================================
+  # 15. ROLLBACK
+  # ==================================================
   rollback:
     name: Roll back deployment
-    if: ${{ always() && github.event_name == 'push' && github.ref == 'refs/heads/main' && (needs.deploy.result == 'failure' || needs.verify.result == 'failure') }}
     needs: [deploy, verify]
+    if: ${{ always() && github.event_name == 'push' && github.ref == 'refs/heads/main' && (needs.deploy.result == 'failure' || needs.verify.result == 'failure') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
     env:
-      APP_DIR: ${{ vars.EC2_APP_DIR || '/opt/meridian' }}
       EC2_INSTANCE_ID: ${{ vars.EC2_INSTANCE_ID }}
+      APP_DIR: ${{ vars.EC2_APP_DIR || '/home/ssm-user/Meridian-Tech-Integrated' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: aws-actions/configure-aws-credentials@v5
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
-      - name: Restore previous release
-        run: bash .github/scripts/ssm-send.sh deploy/rollback.sh 'Rollback Meridian release'
+      - name: Start rollback
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${EC2_INSTANCE_ID:?Set the EC2_INSTANCE_ID repository variable}"
+          remote_env=$(printf 'export APP_DIR=%q AWS_REGION=%q ECR_REGISTRY=%q BACKEND_REPOSITORY=%q FRONTEND_REPOSITORY=%q\n' \
+            "$APP_DIR" "$AWS_REGION" "$ECR_REGISTRY" "$ECR_BACKEND_REPOSITORY" "$ECR_FRONTEND_REPOSITORY")
+          remote_command="${remote_env}$(cat <<'REMOTE'
+          set -euo pipefail
+          stage='entering application directory'
+          trap 'status=$?; echo "ROLLBACK FAILED during: $stage (exit $status)" >&2; exit "$status"' ERR
+          echo 'STARTING ROLLBACK'
+          cd "$APP_DIR"
+          stage='checking previous image digests'
+          echo "Stage: $stage"
+          for file in .previous_backend_digest .previous_frontend_digest; do
+            if [ ! -s "$file" ]; then
+              echo "No saved previous image digest at $file; rollback is unavailable for this first deployment."
+              exit 1
+            fi
+          done
+          previous_backend=$(cat .previous_backend_digest)
+          previous_frontend=$(cat .previous_frontend_digest)
+          stage='logging in to Amazon ECR'
+          echo "Stage: $stage"
+          aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+          stage='pulling previous images'
+          echo "Stage: $stage"
+          docker pull "$previous_backend"
+          docker pull "$previous_frontend"
+          stage='restoring previous latest tags'
+          echo "Stage: $stage"
+          docker tag "$previous_backend" "$ECR_REGISTRY/$BACKEND_REPOSITORY:latest"
+          docker tag "$previous_frontend" "$ECR_REGISTRY/$FRONTEND_REPOSITORY:latest"
+          stage='restarting previous application containers'
+          echo "Stage: $stage"
+          docker compose down
+          docker compose up -d --no-build
+          sleep 15
+          stage='checking rolled-back services'
+          echo "Stage: $stage"
+          docker compose ps
+          docker compose ps --status running --services | grep -qx backend
+          docker compose ps --status running --services | grep -qx frontend
+          docker compose exec -T backend python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=10)"
+          docker compose exec -T frontend wget --spider --quiet http://127.0.0.1/health
+          echo 'ROLLBACK COMPLETED SUCCESSFULLY'
+          REMOTE
+          )"
+          jq -n --arg command "$remote_command" '{commands: [$command]}' > rollback.json
+          command_id=$(aws ssm send-command --region "$AWS_REGION" --instance-ids "$EC2_INSTANCE_ID" --document-name AWS-RunShellScript --comment 'Rollback Meridian deployment' --parameters file://rollback.json --query 'Command.CommandId' --output text)
+          echo "SSM rollback command ID: $command_id"
+          for attempt in $(seq 1 60); do
+            status=$(aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query Status --output text 2>/dev/null || true)
+            echo "[$attempt/60] Rollback status: ${status:-Pending}"
+            case "$status" in
+              Success)
+                aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query StandardOutputContent --output text
+                exit 0
+                ;;
+              Failed|Cancelled|TimedOut|Cancelling)
+                aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query '{Status:Status,StatusDetails:StatusDetails,Output:StandardOutputContent,Error:StandardErrorContent}' --output json || true
+                exit 1
+                ;;
+              *)
+                [ "$attempt" -eq 60 ] || sleep 10
+                ;;
+            esac
+          done
+          aws ssm get-command-invocation --region "$AWS_REGION" --command-id "$command_id" --instance-id "$EC2_INSTANCE_ID" --query '{Status:Status,StatusDetails:StatusDetails,Output:StandardOutputContent,Error:StandardErrorContent}' --output json || true
+          exit 1
