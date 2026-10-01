@@ -143,13 +143,13 @@ SYSTEM_PROMPT = BASE_SYSTEM_PROMPT + ACTION_DIRECTIVES
 
 
 class SelfHelpAgent:
-    def __init__(self, model_id: str = None, region_name: str = "ap-south-1"):
+    def __init__(self, model_id: str = None, region_name: str = "us-east-1"):
         load_dotenv()
         # Allow model override via environment variable
         # Options: 
         # - anthropic.claude-3-haiku-20240307-v1:0 (Fast & Cheap, but weaker)
         # - anthropic.claude-3-5-sonnet-20240620-v1:0 (Best quality, recommended)
-        default_model = os.getenv("BEDROCK_MODEL_ID", "anthropic.claude-3-haiku-20240307-v1:0")
+        default_model = os.getenv("BEDROCK_MODEL_ID", "anthropic.claude-haiku-4-5-20251001-v1:0")
         self.model_id = model_id or default_model
         self.region_name = os.getenv("AWS_REGION", region_name)
         self._client = None
