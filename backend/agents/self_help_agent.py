@@ -152,8 +152,6 @@ class SelfHelpAgent:
         default_model = os.getenv("BEDROCK_MODEL_ID", "anthropic.claude-3-haiku-20240307-v1:0")
         self.model_id = model_id or default_model
         self.region_name = os.getenv("AWS_REGION", region_name)
-        self.aws_key = os.getenv("AWS_ACCESS_KEY_ID")
-        self.aws_secret = os.getenv("AWS_SECRET_ACCESS_KEY")
         self._client = None
         self.system_prompt = SYSTEM_PROMPT
         
@@ -161,7 +159,7 @@ class SelfHelpAgent:
 
     @property
     def client(self):
-        if self._client is None and self.aws_key and self.aws_secret:
+        if self._client is None:
             self._client = boto3.client(
                 "bedrock-runtime",
                 aws_access_key_id=self.aws_key,
