@@ -162,8 +162,6 @@ class SelfHelpAgent:
         if self._client is None:
             self._client = boto3.client(
                 "bedrock-runtime",
-                aws_access_key_id=self.aws_key,
-                aws_secret_access_key=self.aws_secret,
                 region_name=self.region_name
             )
         return self._client
