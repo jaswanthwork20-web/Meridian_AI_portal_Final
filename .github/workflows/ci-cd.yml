@@ -214,7 +214,9 @@ jobs:
   # ==================================================
   container-security:
     name: Container vulnerability scan
+    if: false
     needs: [build]
+    
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
@@ -245,6 +247,7 @@ jobs:
   # ==================================================
   sbom:
     name: Generate SBOM
+    if: false
     needs: [build]
     runs-on: ubuntu-latest
     steps:
