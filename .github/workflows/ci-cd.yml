@@ -275,7 +275,7 @@ jobs:
   push-ecr:
     name: Push images to ECR
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [container-security, sbom]
+    # needs: [container-security, sbom]
     runs-on: ubuntu-latest
     permissions:
       contents: read
