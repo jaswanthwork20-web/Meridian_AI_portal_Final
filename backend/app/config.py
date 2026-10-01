@@ -71,7 +71,9 @@ CONFLUENCE_SPACE_KEY = os.getenv("CONFLUENCE_SPACE_KEY", "SELFHELP")
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
-BEDROCK_MODEL_ID = "anthropic.claude-3-haiku-20240307-v1:0"
-
+BEDROCK_MODEL_ID = os.getenv(
+    "BEDROCK_MODEL_ID",
+    "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+)
 # Confidence Thresholds
 CONFIDENCE_THRESHOLD = 0.45
