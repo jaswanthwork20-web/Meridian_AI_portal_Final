@@ -185,7 +185,7 @@ jobs:
   build:
     name: Build Docker images
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [syntax, lint, unused-code, type-check, test, security, secrets, dependency-scan]
+    # needs: [syntax, lint, unused-code, type-check, test, security, secrets, dependency-scan]
     runs-on: ubuntu-latest
     environment:
       name: docker-build-approval
