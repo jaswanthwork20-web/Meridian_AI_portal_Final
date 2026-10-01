@@ -209,65 +209,65 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
-  # ==================================================
-  # 10. DOCKER VULNERABILITY SCAN
-  # ==================================================
-  # container-security:
-  #   name: Container vulnerability scan
-  #   needs: [build]
-  #   runs-on: ubuntu-latest
-  #   continue-on-error: true
-  #   steps:
-  #     - uses: actions/download-artifact@v4
-  #       with:
-  #         name: container-images
-  #     - name: Load Docker images
-  #       run: |
-  #         docker load -i frontend.tar
-  #         docker load -i backend.tar
-  #     - name: Trivy frontend scan
-  #       uses: aquasecurity/trivy-action@master
-  #       with:
-  #         image-ref: ${{ env.ECR_REGISTRY }}/${{ env.ECR_FRONTEND_REPOSITORY }}:latest
-  #         severity: CRITICAL,HIGH
-  #         format: table
-  #         exit-code: "0"
-  #     - name: Trivy backend scan
-  #       uses: aquasecurity/trivy-action@master
-  #       with:
-  #         image-ref: ${{ env.ECR_REGISTRY }}/${{ env.ECR_BACKEND_REPOSITORY }}:latest
-  #         severity: CRITICAL,HIGH
-  #         format: table
-  #         exit-code: "0"
+  ==================================================
+  10. DOCKER VULNERABILITY SCAN
+  ==================================================
+  container-security:
+    name: Container vulnerability scan
+    needs: [build]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: container-images
+      - name: Load Docker images
+        run: |
+          docker load -i frontend.tar
+          docker load -i backend.tar
+      - name: Trivy frontend scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.ECR_REGISTRY }}/${{ env.ECR_FRONTEND_REPOSITORY }}:latest
+          severity: CRITICAL,HIGH
+          format: table
+          exit-code: "0"
+      - name: Trivy backend scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.ECR_REGISTRY }}/${{ env.ECR_BACKEND_REPOSITORY }}:latest
+          severity: CRITICAL,HIGH
+          format: table
+          exit-code: "0"
 
-  # # ==================================================
-  # # 11. SBOM GENERATION
-  # # ==================================================
-  # sbom:
-  #   name: Generate SBOM
-  #   needs: [build]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/download-artifact@v4
-  #       with:
-  #         name: container-images
-  #     - name: Load Docker images
-  #       run: |
-  #         docker load -i frontend.tar
-  #         docker load -i backend.tar
-  #     - name: Install Syft
-  #       run: curl -sSfL https://raw.githubusercontent.com/anchore/syft/v1.52.0/install.sh | sh -s -- -b /usr/local/bin v1.52.0
-  #     - name: Generate frontend SBOM
-  #       run: syft "$ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest" -o cyclonedx-json=frontend-sbom.json
-  #     - name: Generate backend SBOM
-  #       run: syft "$ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest" -o cyclonedx-json=backend-sbom.json
-  #     - name: Upload SBOM
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: sbom
-  #         path: "*-sbom.json"
-  #         retention-days: 90
-  #         if-no-files-found: error
+  # ==================================================
+  # 11. SBOM GENERATION
+  # ==================================================
+  sbom:
+    name: Generate SBOM
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: container-images
+      - name: Load Docker images
+        run: |
+          docker load -i frontend.tar
+          docker load -i backend.tar
+      - name: Install Syft
+        run: curl -sSfL https://raw.githubusercontent.com/anchore/syft/v1.52.0/install.sh | sh -s -- -b /usr/local/bin v1.52.0
+      - name: Generate frontend SBOM
+        run: syft "$ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest" -o cyclonedx-json=frontend-sbom.json
+      - name: Generate backend SBOM
+        run: syft "$ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest" -o cyclonedx-json=backend-sbom.json
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: "*-sbom.json"
+          retention-days: 90
+          if-no-files-found: error
 
 
   # ==================================================
