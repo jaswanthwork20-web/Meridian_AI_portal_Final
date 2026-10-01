@@ -208,7 +208,6 @@ jobs:
             backend.tar
           retention-days: 1
           if-no-files-found: error
-
   ==================================================
   10. DOCKER VULNERABILITY SCAN
   ==================================================
